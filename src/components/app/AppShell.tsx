@@ -28,8 +28,7 @@ import { PlatformChangeTracker } from './PlatformChangeTracker';
 import { SmartRecycler } from './SmartRecycler';
 import { QualifiedRevenueAnalytics } from './QualifiedRevenueAnalytics';
 import { DealPipelineCRM } from './DealPipelineCRM';
-import { mockDeals } from '../../data/mockData';
-import { SponsorshipDeal } from '../../types';
+import { useDeals } from '../../hooks/useDeals';
 
 interface AppShellProps {
   activeTab: string;
@@ -39,11 +38,10 @@ interface AppShellProps {
 
 export const AppShell: React.FC<AppShellProps> = ({ activeTab, setActiveTab, onNavigateToWebsite }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [dealsList, setDealsList] = useState<SponsorshipDeal[]>(mockDeals);
+  const { addDeal } = useDeals();
 
-  const handleAddDealFromExternal = (brandName: string, amount: number) => {
-    const newDeal: SponsorshipDeal = {
-      id: `deal-${Date.now()}`,
+  const handleAddDealFromExternal = async (brandName: string, amount: number) => {
+    await addDeal({
       brandName: brandName || 'New Brand Sponsor',
       contactEmail: `partnerships@${brandName.toLowerCase().replace(/\s+/g, '') || 'sponsor'}.com`,
       stage: 'Pitched',
@@ -56,8 +54,7 @@ export const AppShell: React.FC<AppShellProps> = ({ activeTab, setActiveTab, onN
       paidAmount: 0,
       notes: 'Generated and added from Creator Rate Calculator.',
       lastContactDate: 'Today'
-    };
-    setDealsList((prev) => [newDeal, ...prev]);
+    });
     setActiveTab('deal-crm');
   };
 
@@ -207,7 +204,7 @@ export const AppShell: React.FC<AppShellProps> = ({ activeTab, setActiveTab, onN
         {activeTab === 'platform-changes' && <PlatformChangeTracker />}
         {activeTab === 'recycler' && <SmartRecycler />}
         {activeTab === 'revenue-analytics' && <QualifiedRevenueAnalytics />}
-        {activeTab === 'deal-crm' && <DealPipelineCRM initialDeals={dealsList} />}
+        {activeTab === 'deal-crm' && <DealPipelineCRM />}
       </main>
     </div>
   );

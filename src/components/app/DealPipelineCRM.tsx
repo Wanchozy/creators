@@ -12,13 +12,18 @@ import {
   MoreVertical,
   ExternalLink,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  Trash2,
+  RefreshCw
 } from 'lucide-react';
-import { mockDeals } from '../../data/mockData';
+import { useDeals } from '../../hooks/useDeals';
 import { DealStage, SponsorshipDeal } from '../../types';
 
 export const DealPipelineCRM: React.FC<{ initialDeals?: SponsorshipDeal[] }> = ({ initialDeals }) => {
-  const [deals, setDeals] = useState<SponsorshipDeal[]>(initialDeals || mockDeals);
+  const { deals: repoDeals, loading, changeStage, addDeal, removeDeal, refresh } = useDeals();
+  // Allow props override if provided, otherwise use repository data
+  const deals = initialDeals && initialDeals.length > 0 ? initialDeals : repoDeals;
+
   const [selectedDeal, setSelectedDeal] = useState<SponsorshipDeal | null>(null);
   const [isNewDealModalOpen, setIsNewDealModalOpen] = useState<boolean>(false);
   const [invoiceModalDeal, setInvoiceModalDeal] = useState<SponsorshipDeal | null>(null);
@@ -31,29 +36,16 @@ export const DealPipelineCRM: React.FC<{ initialDeals?: SponsorshipDeal[] }> = (
 
   const stages: DealStage[] = ['New', 'Pitched', 'Negotiating', 'Active', 'Delivered', 'Paid'];
 
-  const handleStageChange = (dealId: string, newStage: DealStage) => {
-    setDeals(
-      deals.map((d) => {
-        if (d.id === dealId) {
-          const isPaid = newStage === 'Paid';
-          return {
-            ...d,
-            stage: newStage,
-            paidAmount: isPaid ? d.dealValue : d.paidAmount
-          };
-        }
-        return d;
-      })
-    );
+  const handleStageChange = async (dealId: string, newStage: DealStage) => {
+    await changeStage(dealId, newStage);
     if (selectedDeal && selectedDeal.id === dealId) {
       setSelectedDeal({ ...selectedDeal, stage: newStage });
     }
   };
 
-  const handleCreateDeal = () => {
+  const handleCreateDeal = async () => {
     if (!newBrand) return;
-    const newRecord: SponsorshipDeal = {
-      id: `deal-${Date.now()}`,
+    await addDeal({
       brandName: newBrand,
       contactEmail: `partners@${newBrand.toLowerCase().replace(/\s+/g, '')}.com`,
       stage: 'New',
@@ -66,13 +58,22 @@ export const DealPipelineCRM: React.FC<{ initialDeals?: SponsorshipDeal[] }> = (
       paidAmount: 0,
       notes: 'Initial outreach logged from Creator Rate Calculator.',
       lastContactDate: 'Today'
-    };
-    setDeals([...deals, newRecord]);
+    });
     setNewBrand('');
     setIsNewDealModalOpen(false);
   };
 
+  const handleDeleteDeal = async (dealId: string) => {
+    if (window.confirm('Are you sure you want to remove this deal?')) {
+      await removeDeal(dealId);
+      if (selectedDeal && selectedDeal.id === dealId) {
+        setSelectedDeal(null);
+      }
+    }
+  };
+
   const totalPipelineValue = deals.reduce((acc, d) => acc + d.dealValue, 0);
+
   const totalPaidRevenue = deals.filter((d) => d.stage === 'Paid').reduce((acc, d) => acc + d.dealValue, 0);
 
   return (
@@ -296,6 +297,14 @@ export const DealPipelineCRM: React.FC<{ initialDeals?: SponsorshipDeal[] }> = (
                 >
                   <DollarSign className="w-3.5 h-3.5" />
                   <span>Generate Invoice</span>
+                </button>
+                <button
+                  onClick={() => handleDeleteDeal(selectedDeal.id)}
+                  className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-xs font-semibold flex items-center space-x-1 transition"
+                  title="Remove Deal"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete</span>
                 </button>
                 <button
                   onClick={() => setSelectedDeal(null)}

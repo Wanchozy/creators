@@ -12,19 +12,28 @@ import {
   Globe,
   Sliders
 } from 'lucide-react';
-import { mockSponsors } from '../../data/mockData';
+import { defaultSponsorsRepository } from '../../services/api/sponsorsRepository';
 import { BrandSponsor } from '../../types';
 
 export const SponsorRadar: React.FC<{ onPitchCreated?: (brand: string, value: number) => void }> = ({ onPitchCreated }) => {
+  const [sponsors, setSponsors] = useState<BrandSponsor[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [selectedGeo, setSelectedGeo] = useState<string>('All');
   const [activePitchModal, setActivePitchModal] = useState<BrandSponsor | null>(null);
   const [customPitchText, setCustomPitchText] = useState<string>('');
 
+  React.useEffect(() => {
+    defaultSponsorsRepository.fetchSponsors().then((data) => {
+      setSponsors(data);
+      setLoading(false);
+    });
+  }, []);
+
   const categories = ['All', 'Hardware', 'VPN / Security', 'Productivity / SaaS', 'Fintech', 'Gaming'];
   const geos = ['All', 'US', 'Kenya', 'Tanzania', 'UK', 'Global'];
 
-  const filteredSponsors = mockSponsors.filter((sponsor) => {
+  const filteredSponsors = sponsors.filter((sponsor) => {
     const matchesCat = selectedCategory === 'All' || sponsor.category === selectedCategory;
     const matchesGeo =
       selectedGeo === 'All' ||
