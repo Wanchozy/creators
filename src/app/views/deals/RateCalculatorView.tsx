@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   DollarSign,
   Calculator,
@@ -7,18 +7,29 @@ import {
   Sparkles,
   FileCheck,
   ArrowRight,
-  Info
+  Info,
+  Bookmark,
+  Trash2,
+  History,
+  Layers
 } from 'lucide-react';
 import { calculateCreatorDealRate } from '@/shared/domain/rateCalculatorEngine';
-import { RateCalculationInput } from '@/shared/types';
+import { useRateQuotes } from '@/shared/hooks/useRateQuotes';
+import { useProfile } from '@/shared/hooks/useProfile';
+import { useToast } from '@/shared/components/Toast';
+import type { RateCalculationInput } from '@/shared/types';
 
 export const RateCalculatorView: React.FC<{ onSendToCRM?: (brandName: string, amount: number) => void }> = ({ onSendToCRM }) => {
+  const { profile } = useProfile();
+  const { quotes, saveQuote, removeQuote } = useRateQuotes();
+  const { toast } = useToast();
+
   const [params, setParams] = useState<RateCalculationInput>({
-    platform: 'youtube',
+    platform: profile.primaryPlatform || 'youtube',
     contentType: 'integration_60s',
     avgViews: 42000,
-    creatorFollowers: 50000,
-    category: 'Tech & Productivity',
+    creatorFollowers: profile.subscriberCount || 50000,
+    category: profile.niche || 'Tech & Productivity',
     brandCanRepost: true,
     paidAdvertisingRights: true,
     exclusivityDays: 30,
@@ -26,8 +37,56 @@ export const RateCalculatorView: React.FC<{ onSendToCRM?: (brandName: string, am
     turnaroundRush: false
   });
 
+  useEffect(() => {
+    if (profile) {
+      setParams((prev) => ({
+        ...prev,
+        platform: profile.primaryPlatform || prev.platform,
+        creatorFollowers: profile.subscriberCount || prev.creatorFollowers,
+        category: profile.niche || prev.category,
+      }));
+    }
+  }, [profile]);
+
   const [dealBrandName, setDealBrandName] = useState<string>('Prospective Sponsor');
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   const result = calculateCreatorDealRate(params);
+
+  const handleSaveQuoteOnly = async () => {
+    setIsSaving(true);
+    try {
+      await saveQuote(dealBrandName, params, result);
+      toast.success(`Commercial quote for "${dealBrandName}" saved to your Supabase history!`);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to save quote');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveAndPushToCRM = async () => {
+    setIsSaving(true);
+    try {
+      await saveQuote(dealBrandName, params, result);
+      if (onSendToCRM) {
+        onSendToCRM(dealBrandName, result.recommendedPrice);
+      }
+      toast.success(`Quote saved & pushed ${dealBrandName} ($${result.recommendedPrice.toLocaleString()}) to CRM!`);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to save quote to CRM');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteQuote = async (id: string) => {
+    try {
+      await removeQuote(id);
+      toast.success('Saved quote removed');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to remove quote');
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -35,7 +94,7 @@ export const RateCalculatorView: React.FC<{ onSendToCRM?: (brandName: string, am
       <div className="pb-6 border-b border-slate-800">
         <div className="flex items-center space-x-2 text-xs font-semibold text-teal-400 mb-1">
           <DollarSign className="w-3.5 h-3.5" />
-          <span>Problem #5: "What should I charge?"</span>
+          <span>Commercial Pricing Engine</span>
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Creator Rate & Commercial Deal Calculator</h1>
         <p className="text-xs sm:text-sm text-slate-400">
@@ -87,6 +146,7 @@ export const RateCalculatorView: React.FC<{ onSendToCRM?: (brandName: string, am
                   <option value="Fintech & Business">Fintech & Business ($35+ CPM)</option>
                   <option value="Gaming & Entertainment">Gaming ($18 CPM)</option>
                   <option value="Lifestyle & Vlog">Lifestyle ($20 CPM)</option>
+                  <option value="Education & Science">Education & Science ($28 CPM)</option>
                 </select>
               </div>
             </div>
@@ -98,150 +158,116 @@ export const RateCalculatorView: React.FC<{ onSendToCRM?: (brandName: string, am
                 {[
                   { id: 'integration_60s', label: '60s Integration' },
                   { id: 'dedicated_video', label: 'Dedicated 5-7m' },
-                  { id: 'ugc_ad', label: 'UGC for Brand Ad' },
-                  { id: 'short_form', label: 'Shorts / Reel' }
-                ].map((d) => (
+                  { id: 'short_reel', label: 'Short / Reel / TikTok' },
+                  { id: 'community_post', label: 'Community / Story' },
+                ].map((format) => (
                   <button
-                    key={d.id}
-                    onClick={() => setParams({ ...params, contentType: d.id as any })}
-                    className={`p-2.5 rounded-xl text-xs font-medium border text-center transition ${
-                      params.contentType === d.id
-                        ? 'border-teal-500 bg-teal-500/20 text-teal-200 font-bold'
+                    key={format.id}
+                    onClick={() => setParams({ ...params, contentType: format.id as any })}
+                    className={`p-2.5 rounded-xl text-xs text-center border transition ${
+                      params.contentType === format.id
+                        ? 'border-teal-500 bg-teal-500/20 text-teal-300 font-bold'
                         : 'border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200'
                     }`}
                   >
-                    {d.label}
+                    {format.label}
                   </button>
                 ))}
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                {params.contentType === 'ugc_ad'
-                  ? 'UGC videos posted to brand accounts require licensing premiums since creator channel does not gain organic followers.'
-                  : 'Channel integrations leverage your authentic audience trust.'}
-              </p>
             </div>
 
-            {/* Average Views Slider */}
-            <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-xs font-semibold text-slate-300">
-                  Average 30-Day Views:
-                </label>
-                <span className="text-sm font-mono font-bold text-teal-400">
-                  {params.avgViews.toLocaleString()} avg views
-                </span>
+            {/* Audience View Metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div>
+                <div className="flex justify-between items-center text-xs mb-1">
+                  <span className="font-semibold text-slate-300">Expected / Avg Views:</span>
+                  <span className="font-mono text-teal-400 font-bold">{params.avgViews.toLocaleString()}</span>
+                </div>
+                <input
+                  type="range"
+                  min="5000"
+                  max="500000"
+                  step="5000"
+                  value={params.avgViews}
+                  onChange={(e) => setParams({ ...params, avgViews: Number(e.target.value) })}
+                  className="w-full accent-teal-500 bg-slate-800"
+                />
               </div>
-              <input
-                type="range"
-                min="5000"
-                max="250000"
-                step="5000"
-                value={params.avgViews}
-                onChange={(e) => setParams({ ...params, avgViews: Number(e.target.value) })}
-                className="w-full accent-teal-500 bg-slate-800 h-2 rounded-lg cursor-pointer"
-              />
-              <div className="flex justify-between text-[10px] text-slate-400 mt-1">
-                <span>5,000 views</span>
-                <span>42,000 views (Doc example)</span>
-                <span>250,000 views</span>
+
+              <div>
+                <div className="flex justify-between items-center text-xs mb-1">
+                  <span className="font-semibold text-slate-300">Exclusivity Period:</span>
+                  <span className="font-mono text-teal-400 font-bold">{params.exclusivityDays} days</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="90"
+                  step="15"
+                  value={params.exclusivityDays}
+                  onChange={(e) => setParams({ ...params, exclusivityDays: Number(e.target.value) })}
+                  className="w-full accent-teal-500 bg-slate-800"
+                />
               </div>
             </div>
 
-            {/* Commercial Rights Section */}
+            {/* Commercial Rights Toggles */}
             <div className="pt-3 border-t border-slate-800 space-y-3">
-              <label className="text-xs font-bold text-slate-200 uppercase tracking-wider block">
-                Usage Rights & Licensing Toggles:
-              </label>
+              <div className="text-xs font-bold text-slate-300 uppercase tracking-wider">
+                Commercial & Advertising Rights
+              </div>
 
-              {/* Paid Ad Rights / Whitelisting */}
-              <div
-                onClick={() => setParams({ ...params, paidAdvertisingRights: !params.paidAdvertisingRights })}
-                className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                  params.paidAdvertisingRights
-                    ? 'border-emerald-500/50 bg-emerald-500/10'
-                    : 'border-slate-800 bg-slate-950/70 hover:border-slate-700'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="flex items-start space-x-3 p-3 rounded-xl border border-slate-800 bg-slate-950 cursor-pointer hover:border-slate-700 transition">
                   <input
                     type="checkbox"
                     checked={params.paidAdvertisingRights}
-                    onChange={() => {}}
-                    className="rounded text-teal-500 bg-slate-800 border-slate-700 h-4 w-4"
+                    onChange={(e) => setParams({ ...params, paidAdvertisingRights: e.target.checked })}
+                    className="mt-0.5 rounded border-slate-700 text-teal-500 focus:ring-teal-500"
                   />
                   <div>
-                    <div className="text-xs font-bold text-white">Paid Advertising Rights / Whitelisting</div>
-                    <div className="text-[11px] text-slate-400">
-                      Brand puts their own advertising budget behind your video/face on Meta or TikTok Ads
-                    </div>
+                    <div className="text-xs font-bold text-white">Paid Ad Rights (Whitelisting)</div>
+                    <div className="text-[11px] text-slate-400">Brand can put ad spend behind your face & video (+40%).</div>
                   </div>
-                </div>
-                <span className="text-xs font-mono font-bold text-emerald-400">+40% per 30d</span>
-              </div>
+                </label>
 
-              {/* Brand Reposting */}
-              <div
-                onClick={() => setParams({ ...params, brandCanRepost: !params.brandCanRepost })}
-                className={`p-3 rounded-xl border cursor-pointer transition flex items-center justify-between ${
-                  params.brandCanRepost
-                    ? 'border-teal-500/50 bg-teal-500/10'
-                    : 'border-slate-800 bg-slate-950/70 hover:border-slate-700'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
+                <label className="flex items-start space-x-3 p-3 rounded-xl border border-slate-800 bg-slate-950 cursor-pointer hover:border-slate-700 transition">
                   <input
                     type="checkbox"
                     checked={params.brandCanRepost}
-                    onChange={() => {}}
-                    className="rounded text-teal-500 bg-slate-800 border-slate-700 h-4 w-4"
+                    onChange={(e) => setParams({ ...params, brandCanRepost: e.target.checked })}
+                    className="mt-0.5 rounded border-slate-700 text-teal-500 focus:ring-teal-500"
                   />
                   <div>
-                    <div className="text-xs font-bold text-white">Organic Brand Reposting Rights</div>
-                    <div className="text-[11px] text-slate-400">
-                      Brand can re-upload to their company social channels organically
-                    </div>
+                    <div className="text-xs font-bold text-white">Brand Social Repost Rights</div>
+                    <div className="text-[11px] text-slate-400">Allows brand to repost edit to their own channels (+25%).</div>
                   </div>
-                </div>
-                <span className="text-xs font-mono font-bold text-teal-400">+15%</span>
-              </div>
+                </label>
 
-              {/* Exclusivity Duration */}
-              <div className="p-3 rounded-xl border border-slate-800 bg-slate-950/70 flex items-center justify-between">
-                <div>
-                  <div className="text-xs font-bold text-white">Category Exclusivity Window:</div>
-                  <div className="text-[11px] text-slate-400">
-                    You agree not to work with category competitors for this duration
+                <label className="flex items-start space-x-3 p-3 rounded-xl border border-slate-800 bg-slate-950 cursor-pointer hover:border-slate-700 transition">
+                  <input
+                    type="checkbox"
+                    checked={params.turnaroundRush}
+                    onChange={(e) => setParams({ ...params, turnaroundRush: e.target.checked })}
+                    className="mt-0.5 rounded border-slate-700 text-teal-500 focus:ring-teal-500"
+                  />
+                  <div>
+                    <div className="text-xs font-bold text-white">Rush Turnaround (&lt; 5 Days)</div>
+                    <div className="text-[11px] text-slate-400">Emergency production fee (+30%).</div>
                   </div>
-                </div>
-                <div className="flex items-center space-x-1.5">
-                  {[0, 30, 60, 90].map((d) => (
-                    <button
-                      key={d}
-                      onClick={() => setParams({ ...params, exclusivityDays: d })}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition ${
-                        params.exclusivityDays === d
-                          ? 'border-teal-500 bg-teal-500/20 text-teal-300'
-                          : 'border-slate-800 text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      {d === 0 ? 'None' : `${d}d`}
-                    </button>
-                  ))}
-                </div>
+                </label>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right 5 Columns: The Quote & Why */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="rounded-2xl border border-teal-500/40 bg-gradient-to-b from-slate-900 to-slate-950 p-6 space-y-6 shadow-2xl">
-            <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
+        {/* Right 5 Columns: The Quote Result Card */}
+        <div className="lg:col-span-5 rounded-2xl border border-teal-500/30 bg-gradient-to-b from-slate-900 via-slate-900 to-teal-950/20 p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden">
+          <div className="space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
               <div>
-                <span className="text-[10px] uppercase font-bold text-teal-400 tracking-wider">
-                  Commercial Valuation
-                </span>
-                <div className="text-xs text-slate-400">Recommended Pitch Price</div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-teal-400">Recommended Baseline Fee</span>
+                <h3 className="text-base font-bold text-white">Fair Commercial Value</h3>
               </div>
               <div className="text-right">
                 <div className="text-3xl font-extrabold text-white font-mono">
@@ -284,34 +310,102 @@ export const RateCalculatorView: React.FC<{ onSendToCRM?: (brandName: string, am
               "If the brand pushes back on price, do not drop your fee—drop a right! E.g. Remove the 30-day paid advertising rights to reduce the total to ${(result.recommendedPrice - result.breakdown.paidUsageMarkup).toLocaleString()}."
             </div>
 
-            {/* Export / Add to CRM */}
+            {/* Actions: Save & Push */}
             <div className="space-y-3 pt-2">
-              <div className="flex items-center space-x-2">
+              <div>
+                <label className="text-xs font-semibold text-slate-300 block mb-1">Client / Brand Sponsor:</label>
                 <input
                   type="text"
-                  placeholder="Enter Brand Name (e.g. Nike, Brand X)"
+                  placeholder="e.g. Nike, Notion, NordVPN"
                   value={dealBrandName}
                   onChange={(e) => setDealBrandName(e.target.value)}
-                  className="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500"
                 />
               </div>
 
-              <button
-                onClick={() => {
-                  if (onSendToCRM) {
-                    onSendToCRM(dealBrandName, result.recommendedPrice);
-                  }
-                  alert(`Added ${dealBrandName} ($${result.recommendedPrice.toLocaleString()}) to Sponsorship CRM Pipeline!`);
-                }}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-600 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center space-x-2 shadow-lg shadow-teal-500/20 transition"
-              >
-                <FileCheck className="w-4 h-4" />
-                <span>Save Quote & Push Deal to CRM Pipeline</span>
-              </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  onClick={handleSaveQuoteOnly}
+                  disabled={isSaving}
+                  className="py-2.5 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center space-x-1.5 transition disabled:opacity-50"
+                >
+                  <Bookmark className="w-3.5 h-3.5 text-teal-400" />
+                  <span>Save Quote</span>
+                </button>
+
+                <button
+                  onClick={handleSaveAndPushToCRM}
+                  disabled={isSaving}
+                  className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-600 to-indigo-600 hover:from-teal-400 hover:to-indigo-500 text-white font-bold text-xs flex items-center justify-center space-x-1.5 shadow-lg shadow-teal-500/20 transition disabled:opacity-50"
+                >
+                  <FileCheck className="w-3.5 h-3.5" />
+                  <span>Push to CRM</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Saved Commercial Quotes Section */}
+      {quotes.length > 0 && (
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <div className="flex items-center space-x-2 text-xs font-bold text-white uppercase tracking-wider">
+              <History className="w-4 h-4 text-teal-400" />
+              <span>Saved Commercial Quotes ({quotes.length})</span>
+            </div>
+            <span className="text-[11px] text-slate-400 font-mono">Synced with Supabase</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {quotes.map((q) => (
+              <div
+                key={q.id}
+                className="p-4 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-slate-700 transition flex flex-col justify-between space-y-3"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-white truncate">{q.clientName}</span>
+                    <span className="text-xs font-mono font-bold text-teal-400">
+                      ${q.recommendedPrice.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-1">
+                    {q.platform} • {q.contentType.replace('_', ' ')} • {q.category}
+                  </div>
+                  <div className="text-[10px] text-slate-500 mt-1 font-mono">
+                    Fair: ${q.minPrice.toLocaleString()} - ${q.maxPrice.toLocaleString()}
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                  <button
+                    onClick={() => {
+                      if (onSendToCRM) {
+                        onSendToCRM(q.clientName, q.recommendedPrice);
+                      }
+                      toast.success(`Pushed ${q.clientName} ($${q.recommendedPrice.toLocaleString()}) to CRM!`);
+                    }}
+                    className="text-[11px] text-brand-400 hover:text-brand-300 font-semibold flex items-center space-x-1"
+                  >
+                    <Layers className="w-3 h-3" />
+                    <span>Push to CRM</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleDeleteQuote(q.id)}
+                    className="p-1 text-slate-500 hover:text-rose-400 transition"
+                    title="Delete quote"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

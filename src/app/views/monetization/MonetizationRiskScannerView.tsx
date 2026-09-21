@@ -11,9 +11,11 @@ import {
   Sparkles
 } from 'lucide-react';
 import { mockRiskChecks } from '@/shared/data/mockData';
+import { useToast } from '@/shared/components/Toast';
 import { MonetizationRiskCheck } from '@/shared/types';
 
 export const MonetizationRiskScannerView: React.FC = () => {
+  const { toast } = useToast();
   const [checks, setChecks] = useState<MonetizationRiskCheck[]>(mockRiskChecks);
   const [selectedCheckId, setSelectedCheckId] = useState<string>('risk-1');
   const [isSimulatingUpload, setIsSimulatingUpload] = useState<boolean>(false);
@@ -49,6 +51,7 @@ export const MonetizationRiskScannerView: React.FC = () => {
       setSelectedCheckId(newCheck.id);
       setIsSimulatingUpload(false);
       setUploadedFileName('');
+      toast.success('Pre-publish monetization audit complete: Profile generated.');
     }, 1500);
   };
 

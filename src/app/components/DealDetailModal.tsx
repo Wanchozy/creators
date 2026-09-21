@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle2, Mail, FileText, DollarSign, Trash2 } from 'lucide-react';
+import { useToast } from '@/shared/components/Toast';
 import type { SponsorshipDeal, DealStage } from '@/shared/types';
 
 interface DealDetailModalProps {
@@ -19,6 +20,7 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
   onDeleteDeal,
   onClose,
 }) => {
+  const { toast } = useToast();
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl">
@@ -105,14 +107,14 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
         <div className="pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => alert(`Sent follow-up nudge to ${deal.contactEmail}`)}
+              onClick={() => toast.success(`Sent follow-up nudge to ${deal.contactEmail}`)}
               className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center space-x-1.5"
             >
               <Mail className="w-3.5 h-3.5 text-amber-400" />
               <span>Send Follow-Up</span>
             </button>
             <button
-              onClick={() => alert('Contract document uploaded & attached!')}
+              onClick={() => toast.success('Contract document uploaded & attached!')}
               className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition flex items-center space-x-1.5"
             >
               <FileText className="w-3.5 h-3.5 text-brand-400" />

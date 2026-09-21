@@ -10,6 +10,7 @@ const DEMO_USER: AuthUser = {
   displayName: 'Alex Rivers',
   channelName: 'Alex Tech & Design',
   isDemo: true,
+  onboardingCompleted: true,
 };
 
 let _currentUserId: string = DEMO_USER_ID;
@@ -45,41 +46,58 @@ export async function signUp(
   email: string,
   password: string,
   channelName?: string
-): Promise<{ user: AuthUser | null; error: Error | null }> {
+): Promise<{ user: AuthUser | null; session: Session | null; needsEmailConfirmation: boolean; error: Error | null }> {
   if (!hasSupabaseConfig()) {
     return {
-      user: { ...DEMO_USER, email, channelName: channelName || 'My Creator Studio', isDemo: true },
+      user: { ...DEMO_USER, email, channelName: channelName || 'My Creator Studio', isDemo: true, onboardingCompleted: false },
+      session: null,
+      needsEmailConfirmation: false,
       error: null,
     };
   }
 
   try {
     const supabase = getSupabase();
+    const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined;
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           channel_name: channelName || email.split('@')[0],
+          onboarding_completed: false,
+          onboarding_step: 1,
         },
+        emailRedirectTo: redirectUrl,
       },
     });
 
-    if (error) return { user: null, error };
-    if (!data.user) return { user: null, error: new Error('User creation failed.') };
+    if (error) return { user: null, session: null, needsEmailConfirmation: false, error };
+    if (!data.user) return { user: null, session: null, needsEmailConfirmation: false, error: new Error('User creation failed.') };
 
-    return { user: formatAuthUser(data.user), error: null };
+    const needsEmailConfirmation = !data.session;
+    if (data.session) {
+      _currentUserId = data.user.id;
+    }
+
+    return {
+      user: formatAuthUser(data.user),
+      session: data.session,
+      needsEmailConfirmation,
+      error: null,
+    };
   } catch (err: any) {
-    return { user: null, error: err };
+    return { user: null, session: null, needsEmailConfirmation: false, error: err };
   }
 }
 
 export async function signIn(
   email: string,
   password: string
-): Promise<{ user: AuthUser | null; error: Error | null }> {
+): Promise<{ user: AuthUser | null; session: Session | null; error: Error | null }> {
   if (!hasSupabaseConfig()) {
-    return { user: { ...DEMO_USER, email, isDemo: true }, error: null };
+    return { user: { ...DEMO_USER, email, isDemo: true }, session: null, error: null };
   }
 
   try {
@@ -89,13 +107,32 @@ export async function signIn(
       password,
     });
 
-    if (error) return { user: null, error };
-    if (!data.user) return { user: null, error: new Error('Sign in failed.') };
+    if (error) return { user: null, session: null, error };
+    if (!data.user) return { user: null, session: null, error: new Error('Sign in failed.') };
 
     _currentUserId = data.user.id;
-    return { user: formatAuthUser(data.user), error: null };
+    return { user: formatAuthUser(data.user), session: data.session, error: null };
   } catch (err: any) {
-    return { user: null, error: err };
+    return { user: null, session: null, error: err };
+  }
+}
+
+export async function resendVerificationEmail(email: string): Promise<{ error: Error | null }> {
+  if (!hasSupabaseConfig()) return { error: null };
+
+  try {
+    const supabase = getSupabase();
+    const redirectUrl = typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined;
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
+    });
+    return { error };
+  } catch (err: any) {
+    return { error: err };
   }
 }
 
@@ -140,5 +177,6 @@ function formatAuthUser(user: User): AuthUser {
     displayName: user.user_metadata?.display_name ?? user.user_metadata?.channel_name ?? null,
     channelName: user.user_metadata?.channel_name ?? null,
     isDemo: false,
+    onboardingCompleted: Boolean(user.user_metadata?.onboarding_completed),
   };
 }

@@ -12,14 +12,17 @@ import {
   Video
 } from 'lucide-react';
 import { mockClips } from '@/shared/data/mockData';
+import { useToast } from '@/shared/components/Toast';
 import { RepurposedClip } from '@/shared/types';
 
 export const SmartRecyclerView: React.FC = () => {
+  const { toast } = useToast();
   const [clips, setClips] = useState<RepurposedClip[]>(mockClips);
   const [uploadedEpisode, setUploadedEpisode] = useState<string>('podcast_episode_42.mp4');
 
   const handleUpdateStatus = (id: string, newStatus: RepurposedClip['status']) => {
     setClips(clips.map((c) => (c.id === id ? { ...c, status: newStatus } : c)));
+    toast.info(`Clip marked as ${newStatus}`);
   };
 
   return (
@@ -153,7 +156,7 @@ export const SmartRecyclerView: React.FC = () => {
                   </button>
                   {clip.status === 'approved' && (
                     <button
-                      onClick={() => alert(`Exporting 9:16 vertical crop for ${clip.topic}...`)}
+                      onClick={() => toast.success(`Exporting 9:16 vertical crop for ${clip.topic}...`)}
                       className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold flex items-center space-x-1 transition shadow"
                     >
                       <Download className="w-3.5 h-3.5" />

@@ -93,7 +93,9 @@ creator's/
 │       ├── components/                # Universal UI components
 │       │   ├── Navbar.tsx             # Global top header, view toggle & auth status
 │       │   ├── Footer.tsx             # Global footer with deep links
-│       │   └── AuthModal.tsx          # Sign-in / sign-up / Supabase status modal
+│       │   ├── AuthModal.tsx          # Sign-in / sign-up / Supabase auth modal
+│       │   ├── ChannelSettingsModal.tsx # Channel profile, baseline & currency settings
+│       │   └── Toast.tsx              # Application-wide non-blocking notification system
 │       │
 │       ├── config/                    # External services & environment setup
 │       │   └── supabase.ts            # Supabase client singleton & configuration check
@@ -106,14 +108,20 @@ creator's/
 │       ├── repositories/              # Data Access Layer (Supabase + In-Memory Fallback)
 │       │   ├── index.ts               # Barrel export
 │       │   ├── authRepository.ts      # Authentication & user sessions
+│       │   ├── profileRepository.ts   # CRUD for public.profiles
 │       │   ├── dealsRepository.ts     # CRUD for public.sponsorship_deals
 │       │   ├── diagnosticsRepository.ts # CRUD for public.video_diagnostics
 │       │   ├── rateQuotesRepository.ts # CRUD for public.saved_rate_quotes
+│       │   ├── copycatRepository.ts   # CRUD for public.copycat_alerts
 │       │   └── sponsorsRepository.ts  # Queries for public.sponsor_directory
 │       │
 │       ├── hooks/                     # Reusable React State Hooks
 │       │   ├── useAuth.ts             # Reactive user session state
+│       │   ├── useProfile.ts          # Reactive creator channel baseline profile
 │       │   ├── useDeals.ts            # Reactive deal pipeline state (optimistic UI)
+│       │   ├── useDiagnostics.ts      # Reactive video autopsies & audits
+│       │   ├── useRateQuotes.ts       # Reactive commercial quotes history
+│       │   ├── useCopycats.ts         # Reactive clone/plagiarism incident alerts
 │       │   └── useSponsors.ts         # Reactive sponsor directory state
 │       │
 │       ├── data/                      # Fallback & Seed Data

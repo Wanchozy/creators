@@ -9,13 +9,21 @@ import {
   ExternalLink,
   Bot,
   Send,
-  Eye
+  Eye,
+  Trash2,
+  PlusCircle
 } from 'lucide-react';
 import { mockCopycatAlerts } from '@/shared/data/mockData';
-import { CopycatIncident } from '@/shared/types';
+import { useCopycats } from '@/shared/hooks/useCopycats';
+import { useToast } from '@/shared/components/Toast';
+import type { CopycatIncident } from '@/shared/types';
 
 export const OriginalityMonitorView: React.FC = () => {
-  const [alerts, setAlerts] = useState<CopycatIncident[]>(mockCopycatAlerts);
+  const { alerts: repoAlerts, changeStatus, createAlert, removeAlert } = useCopycats();
+  const { toast } = useToast();
+
+  const alerts = repoAlerts.length > 0 ? repoAlerts : mockCopycatAlerts;
+
   const [searchQuery, setSearchQuery] = useState<string>('How I Built My Entire Setup for Under $500');
   const [scriptText, setScriptText] = useState<string>('Most desk setups you see online cost $3,000, but I built this entire minimal workstation for $487. Here is the receipt and the exact compromises...');
   const [isScanning, setIsScanning] = useState<boolean>(false);
@@ -28,11 +36,46 @@ export const OriginalityMonitorView: React.FC = () => {
     setTimeout(() => {
       setIsScanning(false);
       setScanCompleted(true);
+      toast.info('Network scan complete: Detected matching automated channels.');
     }, 1200);
   };
 
-  const handleUpdateStatus = (id: string, newStatus: CopycatIncident['status']) => {
-    setAlerts(alerts.map((a) => (a.id === id ? { ...a, status: newStatus } : a)));
+  const handleLogScannedIncident = async () => {
+    try {
+      await createAlert({
+        originalTitle: searchQuery,
+        suspectChannel: 'ViralClipFactory_99',
+        suspectPlatform: 'tiktok',
+        suspectVideoTitle: searchQuery + ' (AI Voiceover)',
+        similarityScore: 92,
+        detectedDate: 'Today',
+        isAiGeneratedChannel: true,
+        matchType: 'identical_script',
+        status: 'alert',
+      });
+      toast.success('Incident logged and synced with Supabase copycat alerts!');
+      setScanCompleted(false);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to log alert');
+    }
+  };
+
+  const handleUpdateStatus = async (id: string, newStatus: CopycatIncident['status']) => {
+    try {
+      await changeStatus(id, newStatus);
+      toast.info(`Alert marked as ${newStatus.replace('_', ' ')}`);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to update alert');
+    }
+  };
+
+  const handleDeleteAlert = async (id: string) => {
+    try {
+      await removeAlert(id);
+      toast.success('Alert removed');
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to remove alert');
+    }
   };
 
   return (
@@ -89,12 +132,21 @@ export const OriginalityMonitorView: React.FC = () => {
         </div>
 
         {scanCompleted && (
-          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-start space-x-3 text-xs text-amber-200">
-            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold text-white">Scan Result: </span>
-              Found <strong>3 videos</strong> using substantially similar verbatim scripts and pacing. One automated channel copied your opening hook within 18 hours of your upload.
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-amber-200">
+            <div className="flex items-start space-x-3">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-white">Scan Result: </span>
+                Found <strong>3 videos</strong> using substantially similar verbatim scripts. Automated scraper channel cloned your script with AI voiceover (92% similarity).
+              </div>
             </div>
+            <button
+              onClick={handleLogScannedIncident}
+              className="px-3.5 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 transition shrink-0 flex items-center space-x-1.5"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Log & Track Incident</span>
+            </button>
           </div>
         )}
       </div>
@@ -108,7 +160,7 @@ export const OriginalityMonitorView: React.FC = () => {
               Detected Copycat & Scraping Incidents ({alerts.length})
             </h3>
           </div>
-          <span className="text-xs text-slate-400">Continuous 24/7 Web & Platform Monitor</span>
+          <span className="text-xs text-slate-400 font-mono">Synced with Supabase</span>
         </div>
 
         <div className="space-y-3">
@@ -181,6 +233,15 @@ export const OriginalityMonitorView: React.FC = () => {
                       Dismiss
                     </button>
                   )}
+                  {repoAlerts.some(a => a.id === alert.id) && (
+                    <button
+                      onClick={() => handleDeleteAlert(alert.id)}
+                      className="p-1.5 text-slate-500 hover:text-rose-400 transition"
+                      title="Delete alert"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -225,6 +286,12 @@ export const OriginalityMonitorView: React.FC = () => {
               <button
                 onClick={() => {
                   handleUpdateStatus(activeTakedownModal.id, 'takedown_sent');
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(
+                      `Notice of Copyright Infringement: Original work "${activeTakedownModal.originalTitle}" copied by @${activeTakedownModal.suspectChannel} with ${activeTakedownModal.similarityScore}% similarity.`
+                    );
+                    toast.success('Takedown claim copied to clipboard & status updated in Supabase!');
+                  }
                   setActiveTakedownModal(null);
                 }}
                 className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 text-white text-xs font-bold"

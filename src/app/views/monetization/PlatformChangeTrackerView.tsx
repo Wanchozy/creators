@@ -10,9 +10,11 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { mockPlatformChanges } from '@/shared/data/mockData';
+import { useToast } from '@/shared/components/Toast';
 import { PlatformChangeNotice } from '@/shared/types';
 
 export const PlatformChangeTrackerView: React.FC = () => {
+  const { toast } = useToast();
   const [selectedPlatform, setSelectedPlatform] = useState<string>('all');
   const [changes] = useState<PlatformChangeNotice[]>(mockPlatformChanges);
 
@@ -114,7 +116,7 @@ export const PlatformChangeTrackerView: React.FC = () => {
 
               {change.affectedVideosCount > 0 && (
                 <button
-                  onClick={() => alert(`Showing ${change.affectedVideosCount} flagged videos in your catalog.`)}
+                  onClick={() => toast.info(`Catalog Filter: Showing ${change.affectedVideosCount} flagged videos matching ${change.title}.`)}
                   className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold shrink-0 border border-slate-700 transition"
                 >
                   Review Affected Videos

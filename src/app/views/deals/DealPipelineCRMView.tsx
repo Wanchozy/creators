@@ -13,8 +13,11 @@ import type { DealStage, SponsorshipDeal } from '@/shared/types';
 import { DealDetailModal } from '@/app/components/DealDetailModal';
 import { InvoiceModal } from '@/app/components/InvoiceModal';
 
+import { useToast } from '@/shared/components/Toast';
+
 export const DealPipelineCRMView: React.FC<{ initialDeals?: SponsorshipDeal[] }> = ({ initialDeals }) => {
   const { deals: repoDeals, changeStage, addDeal, removeDeal } = useDeals();
+  const { toast } = useToast();
   const deals = initialDeals && initialDeals.length > 0 ? initialDeals : repoDeals;
 
   const [selectedDeal, setSelectedDeal] = useState<SponsorshipDeal | null>(null);
@@ -31,6 +34,7 @@ export const DealPipelineCRMView: React.FC<{ initialDeals?: SponsorshipDeal[] }>
 
   const handleStageChange = async (dealId: string, newStage: DealStage) => {
     await changeStage(dealId, newStage);
+    toast.info(`Deal moved to "${newStage}" stage`);
     if (selectedDeal && selectedDeal.id === dealId) {
       setSelectedDeal({ ...selectedDeal, stage: newStage });
     }
@@ -38,30 +42,38 @@ export const DealPipelineCRMView: React.FC<{ initialDeals?: SponsorshipDeal[] }>
 
   const handleCreateDeal = async () => {
     if (!newBrand) return;
-    await addDeal({
-      brandName: newBrand,
-      contactEmail: `partners@${newBrand.toLowerCase().replace(/\s+/g, '')}.com`,
-      stage: 'New',
-      dealValue: newDealValue,
-      deliverables: [newDeliverables],
-      deadline: newDeadline,
-      usageRights: '30-day organic feed',
-      exclusivityWindow: '30 days',
-      paymentTerms: '50% upfront, 50% post-publication',
-      paidAmount: 0,
-      notes: 'Initial outreach logged from Creator Rate Calculator.',
-      lastContactDate: 'Today',
-    });
-    setNewBrand('');
-    setIsNewDealModalOpen(false);
+    try {
+      await addDeal({
+        brandName: newBrand,
+        contactEmail: `partners@${newBrand.toLowerCase().replace(/\s+/g, '')}.com`,
+        stage: 'New',
+        dealValue: newDealValue,
+        deliverables: [newDeliverables],
+        deadline: newDeadline,
+        usageRights: '30-day organic feed',
+        exclusivityWindow: '30 days',
+        paymentTerms: '50% upfront, 50% post-publication',
+        paidAmount: 0,
+        notes: 'Initial outreach logged.',
+        lastContactDate: 'Today',
+      });
+      toast.success(`Created deal for ${newBrand} ($${newDealValue.toLocaleString()})`);
+      setNewBrand('');
+      setIsNewDealModalOpen(false);
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to create deal');
+    }
   };
 
   const handleDeleteDeal = async (dealId: string) => {
-    if (window.confirm('Are you sure you want to remove this deal?')) {
+    try {
       await removeDeal(dealId);
+      toast.success('Deal removed from pipeline');
       if (selectedDeal && selectedDeal.id === dealId) {
         setSelectedDeal(null);
       }
+    } catch (err: any) {
+      toast.error(err?.message || 'Failed to remove deal');
     }
   };
 

@@ -13,9 +13,13 @@ import {
   Sliders
 } from 'lucide-react';
 import { defaultSponsorsRepository } from '@/shared/repositories/sponsorsRepository';
+import { useProfile } from '@/shared/hooks/useProfile';
+import { useToast } from '@/shared/components/Toast';
 import { BrandSponsor } from '@/shared/types';
 
 export const SponsorRadarView: React.FC<{ onPitchCreated?: (brand: string, value: number) => void }> = ({ onPitchCreated }) => {
+  const { profile } = useProfile();
+  const { toast } = useToast();
   const [sponsors, setSponsors] = useState<BrandSponsor[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -44,8 +48,12 @@ export const SponsorRadarView: React.FC<{ onPitchCreated?: (brand: string, value
 
   const openPitchModal = (sponsor: BrandSponsor) => {
     setActivePitchModal(sponsor);
+    const channelName = profile.channelName || 'Creator Studio';
+    const subCount = (profile.subscriberCount || 52000).toLocaleString();
+    const nicheName = profile.niche || 'practical workflows and tech';
+
     setCustomPitchText(
-      `Hi ${sponsor.contactPerson.split(',')[0].split(' ')[0]},\n\nI run an engaged channel with 52,000+ monthly views focused on practical tech & workflows. I noticed ${sponsor.brandName}'s recent campaign supporting authentic creator integrations.\n\nOur audience matches ${sponsor.brandName}'s target demographic (${sponsor.targetGeos.join(', ')}), with an average 6.2 comments per 1k views. We'd love to produce a dedicated 60-second integration featuring ${sponsor.preferredFormats[0]}.\n\nWould you be open to seeing our media kit and demographic breakdown for next month?\n\nBest,\nAlex`
+      `Hi ${sponsor.contactPerson.split(',')[0].split(' ')[0]},\n\nI run ${channelName}, an engaged channel with ${subCount}+ active audience members focused on ${nicheName}. I noticed ${sponsor.brandName}'s recent campaign supporting authentic creator integrations.\n\nOur audience matches ${sponsor.brandName}'s target demographic (${sponsor.targetGeos.join(', ')}), with an average 6.2 comments per 1k views. We'd love to produce a dedicated 60-second integration featuring ${sponsor.preferredFormats[0] || '1x YouTube 60s Integration'}.\n\nWould you be open to seeing our media kit and demographic breakdown for next month?\n\nBest,\n${channelName}`
     );
   };
 
@@ -231,7 +239,7 @@ export const SponsorRadarView: React.FC<{ onPitchCreated?: (brand: string, value
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(customPitchText);
-                    alert('Copied pitch draft to clipboard!');
+                    toast.success('Pitch email draft copied to clipboard!');
                   }}
                   className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold"
                 >
@@ -243,7 +251,7 @@ export const SponsorRadarView: React.FC<{ onPitchCreated?: (brand: string, value
                       onPitchCreated(activePitchModal.brandName, 1500);
                     }
                     setActivePitchModal(null);
-                    alert(`Created deal for ${activePitchModal.brandName} in Deal Pipeline CRM!`);
+                    toast.success(`Created deal for ${activePitchModal.brandName} in Deal Pipeline CRM!`);
                   }}
                   className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 text-white text-xs font-bold"
                 >

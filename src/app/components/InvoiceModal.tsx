@@ -1,5 +1,6 @@
 import React from 'react';
 import { DollarSign } from 'lucide-react';
+import { useToast } from '@/shared/components/Toast';
 import type { SponsorshipDeal } from '@/shared/types';
 
 interface InvoiceModalProps {
@@ -8,6 +9,7 @@ interface InvoiceModalProps {
 }
 
 export const InvoiceModal: React.FC<InvoiceModalProps> = ({ deal, onClose }) => {
+  const { toast } = useToast();
   return (
     <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
@@ -49,7 +51,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({ deal, onClose }) => 
         <div className="flex justify-end space-x-2 pt-2">
           <button
             onClick={() => {
-              alert('Invoice PDF copied and ready to send!');
+              toast.success('Invoice PDF copied and ready to send!');
               onClose();
             }}
             className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold"

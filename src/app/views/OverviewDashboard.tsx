@@ -14,20 +14,33 @@ import {
   ArrowUpRight,
   ArrowRight,
   CheckCircle2,
-  Calendar
+  Calendar,
+  ShieldCheck
 } from 'lucide-react';
 import { mockDeals, mockVideoDiagnostics, mockPlatformChanges, mockRevenueAnalytics } from '@/shared/data/mockData';
+import { useDeals } from '@/shared/hooks/useDeals';
+import { useDiagnostics } from '@/shared/hooks/useDiagnostics';
+import { useProfile } from '@/shared/hooks/useProfile';
+import { useRateQuotes } from '@/shared/hooks/useRateQuotes';
+import { useCopycats } from '@/shared/hooks/useCopycats';
 
 interface OverviewDashboardProps {
   onNavigateTab: (tab: string) => void;
 }
 
 export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigateTab }) => {
-  const activeDealsValue = mockDeals
-    .filter((d) => d.stage !== 'Paid')
-    .reduce((acc, d) => acc + d.dealValue, 0);
+  const { profile } = useProfile();
+  const { deals } = useDeals();
+  const { diagnostics } = useDiagnostics();
+  const { quotes } = useRateQuotes();
+  const { alerts } = useCopycats();
 
-  const criticalVideo = mockVideoDiagnostics.find((v) => v.status === 'critical_drop') || mockVideoDiagnostics[0];
+  const dealsList = deals.length > 0 ? deals : mockDeals;
+  const activeDeals = dealsList.filter((d) => d.stage !== 'Paid');
+  const activeDealsValue = activeDeals.reduce((acc, d) => acc + d.dealValue, 0);
+
+  const videoList = diagnostics.length > 0 ? diagnostics : mockVideoDiagnostics;
+  const criticalVideo = videoList.find((v) => v.status === 'critical_drop') || videoList[0];
   const highRiskNotice = mockPlatformChanges.find((p) => p.actionRequired) || mockPlatformChanges[0];
 
   return (
@@ -37,7 +50,9 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
         <div>
           <div className="flex items-center space-x-2 text-xs font-semibold text-brand-400 mb-1">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Channel Intelligence Snapshot</span>
+            <span className="capitalize">{profile.channelName || 'Creator'} Channel Intelligence</span>
+            <span className="text-slate-500">•</span>
+            <span className="text-slate-400 font-mono">{(profile.subscriberCount || 0).toLocaleString()} audience</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Creator's Command Center</h1>
           <p className="text-xs sm:text-sm text-slate-400">
@@ -51,7 +66,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
             className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-200 transition flex items-center space-x-1.5"
           >
             <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Rate Calculator</span>
+            <span>Rate Calculator ({quotes.length})</span>
           </button>
           <button
             onClick={() => onNavigateTab('detective')}
@@ -78,7 +93,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
             ${activeDealsValue.toLocaleString()}
           </div>
           <div className="text-[11px] text-emerald-400 mt-1 flex items-center space-x-1">
-            <span>4 deals in negotiation / production</span>
+            <span>{activeDeals.length} deals in negotiation / production</span>
             <ArrowUpRight className="w-3 h-3" />
           </div>
         </div>
@@ -109,24 +124,28 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
             <span className="font-semibold">Algorithm Velocity</span>
             <TrendingDown className="w-4 h-4 text-rose-400" />
           </div>
-          <div className="text-2xl font-extrabold text-rose-400 font-mono">1 Drop Alert</div>
+          <div className="text-2xl font-extrabold text-rose-400 font-mono">
+            {videoList.filter(v => v.status === 'critical_drop').length} Drop Alert
+          </div>
           <div className="text-[11px] text-rose-300/80 mt-1">
-            424 views on latest upload (8s cliff)
+            {criticalVideo.views} views on latest upload (8s cliff)
           </div>
         </div>
 
-        {/* Platform Policy Alert */}
+        {/* Copycat Clones Alert */}
         <div
-          onClick={() => onNavigateTab('platform-changes')}
-          className="rounded-2xl border border-blue-500/30 bg-blue-500/5 p-5 hover:border-blue-500/50 transition cursor-pointer group"
+          onClick={() => onNavigateTab('originality')}
+          className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 hover:border-amber-500/50 transition cursor-pointer group"
         >
-          <div className="flex items-center justify-between text-xs text-blue-300 mb-2">
-            <span className="font-semibold">Platform Policy Shifts</span>
-            <RefreshCw className="w-4 h-4 text-blue-400" />
+          <div className="flex items-center justify-between text-xs text-amber-300 mb-2">
+            <span className="font-semibold">Copycat & Scraper Radar</span>
+            <ShieldAlert className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-2xl font-extrabold text-white font-mono">3 Updates</div>
+          <div className="text-2xl font-extrabold text-white font-mono">
+            {alerts.length} Incidents
+          </div>
           <div className="text-[11px] text-amber-300 mt-1 font-medium">
-            1 requires immediate format adjustment
+            {alerts.filter(a => a.status === 'alert').length} require review or takedown
           </div>
         </div>
       </div>
@@ -223,7 +242,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
             </div>
 
             <div className="space-y-2.5">
-              {mockDeals.slice(0, 3).map((deal) => (
+              {dealsList.slice(0, 3).map((deal) => (
                 <div
                   key={deal.id}
                   onClick={() => onNavigateTab('deal-crm')}
@@ -231,7 +250,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
                 >
                   <div>
                     <div className="text-xs font-bold text-white">{deal.brandName}</div>
-                    <div className="text-[11px] text-slate-400">{deal.deliverables[0]}</div>
+                    <div className="text-[11px] text-slate-400">{deal.deliverables[0] || '1x Integration'}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-xs font-mono font-bold text-emerald-400">${deal.dealValue.toLocaleString()}</div>
