@@ -1,0 +1,5 @@
+export * from './authRepository';
+export * from './dealsRepository';
+export * from './diagnosticsRepository';
+export * from './rateQuotesRepository';
+export * from './sponsorsRepository';

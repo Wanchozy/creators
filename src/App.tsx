@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Navbar } from './components/common/Navbar';
-import { Footer } from './components/common/Footer';
-import { LandingPage } from './components/marketing/LandingPage';
-import { AppShell } from './components/app/AppShell';
+import { Navbar } from '@/shared/components/Navbar';
+import { Footer } from '@/shared/components/Footer';
+import { LandingPage } from '@/website/pages/LandingPage';
+import { AppShell } from '@/app/shell/AppShell';
 
 export function App() {
   const [currentView, setCurrentView] = useState<'marketing' | 'app'>('marketing');
