@@ -309,21 +309,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
         </div>
       </FadeInWhenVisible>
 
-      {/* The 10 Core Problems & Solutions Grid with 3D Tilt & Cursor Spotlight */}
+      {/* The 10 Core Problems & Solutions Grid */}
       <section id="problems" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-3 mb-8">
-          <div className="inline-flex items-center space-x-1 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs text-slate-400">
-            <span>Ground Truth Findings</span>
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+            <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">Ground Truth Findings</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-            10 Real Creator Headaches. 10 Intelligent Solutions.
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+            10 Real Creator Headaches. 10 Direct Solutions.
           </h2>
-          <p className="text-sm text-slate-400 max-w-2xl mx-auto">
+          <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
             Every feature in Creator's is built directly from actual community pain points—from TikTok Creator Rewards view qualification to YouTube 2026 demonetization policies.
           </p>
         </div>
 
-        {/* Interactive Category Filter Pills */}
+        {/* Category Filter Pills */}
         <div className="flex items-center justify-center flex-wrap gap-2 mb-8">
           {[
             { id: 'all', label: 'All 10 Solutions' },
@@ -338,8 +339,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
                 onClick={() => setCategoryFilter(cat.id as any)}
                 className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
                   active
-                    ? 'bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-500/20'
-                    : 'bg-slate-900/80 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
+                    ? 'bg-white text-slate-950 shadow-[0_0_15px_rgba(255,255,255,0.2)]'
+                    : 'bg-white/[0.03] text-slate-400 hover:text-white hover:bg-white/[0.06] border border-white/[0.08]'
                 }`}
               >
                 {cat.label}
@@ -348,7 +349,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
           })}
         </div>
 
-        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div layout className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <AnimatePresence>
             {filteredProblems.map((item) => {
               const Icon = item.icon;
@@ -356,38 +357,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
                 <SpotlightCard
                   key={item.num}
                   enableTilt={true}
-                  className="p-6 flex flex-col justify-between group hover:border-slate-700/80"
+                  className="p-6 flex flex-col justify-between group bg-[#0c0e14] border-white/[0.08] hover:border-white/[0.18]"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-xs font-mono font-bold text-slate-400">{item.num}</span>
-                      <span className={`px-2.5 py-1 rounded-lg text-xs font-semibold border flex items-center space-x-1.5 ${item.color}`}>
+                      <span className="text-xs font-mono font-bold text-slate-500">#{item.num}</span>
+                      <span className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border flex items-center space-x-1.5 ${item.color}`}>
                         <Icon className="w-3.5 h-3.5" />
                         <span>{item.solution}</span>
                       </span>
                     </div>
 
-                    <h3 className="text-base font-bold text-white mb-2 group-hover:text-brand-300 transition">
+                    <h3 className="text-base font-bold text-white mb-2.5 group-hover:text-indigo-300 transition">
                       "{item.problem}"
                     </h3>
 
-                    <div className="text-xs text-slate-400 mb-3 bg-slate-950/70 p-3 rounded-lg border border-slate-800/80">
-                      <span className="font-semibold text-slate-300">Creator Experience: </span>
+                    <div className="text-xs text-slate-400 mb-3 bg-[#080a0f] p-3 rounded-xl border border-white/[0.05]">
+                      <span className="font-semibold text-slate-300 font-mono text-[11px]">SYMPTOM: </span>
                       {item.experience}
                     </div>
 
                     <p className="text-xs text-slate-300 leading-relaxed mb-4">
-                      <span className="font-semibold text-white">How Creator's Solves It: </span>
+                      <span className="font-semibold text-white font-mono text-[11px]">DIAGNOSIS & FIX: </span>
                       {item.desc}
                     </p>
                   </div>
 
                   <button
                     onClick={() => onNavigateToModule(item.tab)}
-                    className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-brand-400 hover:text-brand-300 transition"
+                    className="pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition"
                   >
-                    <span>Open {item.solution}</span>
-                    <ChevronRight className="w-4 h-4 transform group-hover:translate-x-1 transition" />
+                    <span className="font-mono text-[11px]">Launch {item.solution}</span>
+                    <ChevronRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition" />
                   </button>
                 </SpotlightCard>
               );
@@ -398,25 +399,31 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
 
       {/* The 3 Core Pillars */}
       <FadeInWhenVisible className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 p-8 sm:p-12">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <span className="text-xs font-bold text-brand-400 uppercase tracking-wider">The Architectural Foundation</span>
-            <h2 className="text-3xl font-extrabold text-white mt-1">Built As Your Business & Content Operating System</h2>
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-8 sm:p-12 shadow-2xl relative overflow-hidden">
+          {/* Ambient Lighting Accent */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-40 bg-indigo-500/[0.06] blur-3xl pointer-events-none" />
+
+          <div className="text-center max-w-3xl mx-auto mb-12 relative z-10">
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400 mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+              <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">The Architectural Foundation</span>
+            </div>
+            <h2 className="text-3xl font-extrabold text-white tracking-tight">Built As Your Business & Content Operating System</h2>
             <p className="text-xs sm:text-sm text-slate-400 mt-2">
-              Three interconnected pillars supporting creators from their first 10,000 views to six-figure brand partnerships.
+              Three interconnected pillars supporting creators from their first 10,000 views to six-figure commercial partnerships.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-slate-950/80 rounded-2xl border border-slate-800/80 p-6 space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-                <Brain className="w-6 h-6" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+            <div className="bg-[#080a0f] rounded-xl border border-white/[0.06] hover:border-white/[0.14] transition p-6 space-y-4">
+              <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                <Brain className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Pillar 1: Content Intelligence</h3>
+              <h3 className="text-base font-bold text-white">Pillar 1: Content Intelligence</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Replaces mysterious algorithm panic with diagnostic rigor. Finds out why videos die, mines your top 50 uploads for winning traits, and catches AI channels copying your work.
+                Replaces mysterious algorithm panic with diagnostic rigor. Explains why high-effort videos die, mines your top uploads for winning traits, and catches AI channels copying your work.
               </p>
-              <ul className="text-xs text-slate-300 space-y-2 pt-2 border-t border-slate-800">
+              <ul className="text-xs text-slate-300 space-y-2 pt-3 border-t border-white/[0.06]">
                 <li className="flex items-center space-x-2">
                   <CheckCircle className="w-3.5 h-3.5 text-purple-400" />
                   <span>Algorithm Detective (Drop Autopsy)</span>
@@ -432,15 +439,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
               </ul>
             </div>
 
-            <div className="bg-slate-950/80 rounded-2xl border border-slate-800/80 p-6 space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <ShieldAlert className="w-6 h-6" />
+            <div className="bg-[#080a0f] rounded-xl border border-white/[0.06] hover:border-white/[0.14] transition p-6 space-y-4">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <ShieldAlert className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Pillar 2: Monetization & Safety</h3>
+              <h3 className="text-base font-bold text-white">Pillar 2: Monetization & Safety</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                Protects your revenue engine. Pre-screens videos against 2025/2026 reused-content policies, demystifies RPM fluctuations, and alerts you to platform rule updates.
+                Protects your revenue engine. Pre-screens videos against 2026 reused-content policies, demystifies RPM fluctuations, and alerts you to platform rule updates.
               </p>
-              <ul className="text-xs text-slate-300 space-y-2 pt-2 border-t border-slate-800">
+              <ul className="text-xs text-slate-300 space-y-2 pt-3 border-t border-white/[0.06]">
                 <li className="flex items-center space-x-2">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Pre-Publish Monetization Scanner</span>
@@ -456,25 +463,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
               </ul>
             </div>
 
-            <div className="bg-slate-950/80 rounded-2xl border border-slate-800/80 p-6 space-y-4">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-                <DollarSign className="w-6 h-6" />
+            <div className="bg-[#080a0f] rounded-xl border border-white/[0.06] hover:border-white/[0.14] transition p-6 space-y-4">
+              <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <DollarSign className="w-5 h-5" />
               </div>
-              <h3 className="text-lg font-bold text-white">Pillar 3: Deal & Business Hub</h3>
+              <h3 className="text-base font-bold text-white">Pillar 3: Deal & Business Hub</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Turns informal creator DMs into a real business pipeline. Prices usage rights, connects you with active sponsors, and manages deliverables in a unified CRM.
               </p>
-              <ul className="text-xs text-slate-300 space-y-2 pt-2 border-t border-slate-800">
+              <ul className="text-xs text-slate-300 space-y-2 pt-3 border-t border-white/[0.06]">
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-amber-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Sponsor Radar (Targeted Outreach)</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Multi-factor Commercial Deal Calculator</span>
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Commercial Deal Rate Calculator</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-amber-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Sponsorship Kanban CRM Pipeline</span>
                 </li>
               </ul>
@@ -483,52 +490,55 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
         </div>
       </FadeInWhenVisible>
 
-      {/* Transparent Pricing Plans with Monthly/Annual Switcher & BorderBeam */}
+      {/* Transparent Pricing Plans */}
       <FadeInWhenVisible className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-3 mb-8">
-          <span className="text-xs font-bold text-brand-400 uppercase tracking-wider">Predictable Pricing</span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white">Invest in Creator Intelligence</h2>
-          <p className="text-sm text-slate-400 max-w-xl mx-auto">
-            One properly priced usage-rights deal pays for Creator's for an entire decade.
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+            <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">Predictable Pricing</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Invest in Creator Intelligence</h2>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
+            One properly negotiated commercial usage-rights deal pays for Creator's for an entire decade.
           </p>
 
-          {/* Bouncy Billing Toggle */}
-          <div className="inline-flex items-center space-x-3 bg-slate-900/90 border border-slate-800 p-1.5 rounded-2xl shadow-inner mt-4">
+          {/* Billing Toggle */}
+          <div className="inline-flex items-center space-x-1 bg-[#0c0e14] border border-white/[0.08] p-1.5 rounded-xl shadow-inner mt-4">
             <button
               onClick={() => setBillingCycle('monthly')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 billingCycle === 'monthly'
-                  ? 'bg-slate-800 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               Monthly Billing
             </button>
             <button
               onClick={() => setBillingCycle('annual')}
-              className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center space-x-1.5 ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center space-x-1.5 ${
                 billingCycle === 'annual'
-                  ? 'bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-500/20'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-white text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
               <span>Annual Billing</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-emerald-400/20 text-emerald-300 font-bold border border-emerald-400/30">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-700 font-bold border border-emerald-500/30">
                 Save 25%
               </span>
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {/* Free Starter */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 flex flex-col justify-between">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-7 flex flex-col justify-between">
             <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Free Starter</div>
+              <div className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider">Free Starter</div>
               <div className="text-3xl font-extrabold text-white mt-2 font-mono">$0</div>
-              <p className="text-xs text-slate-400 mt-2">For aspiring creators finding their first footing.</p>
+              <p className="text-xs text-slate-400 mt-2">For aspiring creators finding their first baseline.</p>
 
-              <ul className="mt-6 space-y-3 text-xs text-slate-300">
+              <ul className="mt-6 space-y-2.5 text-xs text-slate-300">
                 <li className="flex items-center space-x-2">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
                   <span>3 Video Diagnoses per month</span>
@@ -550,21 +560,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
 
             <button
               onClick={onLaunchApp}
-              className="mt-8 w-full py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition"
+              className="mt-8 w-full py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-white text-xs font-semibold transition"
             >
               Start Free
             </button>
           </div>
 
           {/* Pro Creator with BorderBeam */}
-          <div className="rounded-2xl border-2 border-brand-500 bg-slate-900 p-8 flex flex-col justify-between relative shadow-2xl shadow-brand-500/10 overflow-hidden">
-            <BorderBeam duration={7} borderWidth={2} colorFrom="#6366f1" colorTo="#10b981" />
+          <div className="rounded-2xl border-2 border-indigo-500/70 bg-[#0c0e14] p-7 flex flex-col justify-between relative shadow-[0_0_40px_rgba(99,102,241,0.15)] overflow-hidden">
+            <BorderBeam duration={7} borderWidth={2} colorFrom="#6366f1" colorTo="#a855f7" />
 
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-brand-600 to-indigo-600 text-[10px] font-extrabold text-white uppercase tracking-wider z-20">
-              Most Popular for Full-Time Creators
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-indigo-500 text-[10px] font-mono font-bold text-white uppercase tracking-wider z-20 shadow-md">
+              Most Popular for Creators
             </div>
             <div>
-              <div className="text-xs font-bold text-brand-300 uppercase tracking-wider">Pro Creator</div>
+              <div className="text-[11px] font-mono font-bold text-indigo-400 uppercase tracking-wider">Pro Creator</div>
               <div className="text-3xl font-extrabold text-white mt-2 font-mono flex items-baseline space-x-1">
                 <RollingNumber value={billingCycle === 'annual' ? 22 : 29} prefix="$" />
                 <span className="text-xs text-slate-400 font-sans font-normal">/ month</span>
@@ -575,29 +585,29 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
                   : 'Billed monthly. Cancel anytime.'}
               </p>
 
-              <ul className="mt-6 space-y-3 text-xs text-slate-200">
+              <ul className="mt-6 space-y-2.5 text-xs text-slate-200">
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-brand-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Unlimited Video Diagnoses & Autopsies</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-brand-400" />
-                  <span>Creator Scientist Pattern Discovery (50+ vids)</span>
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Creator Scientist Pattern Discovery</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-brand-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Pre-Upload Monetization Risk Scanner</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-brand-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Sponsor Radar with Verified Brand Contacts</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-brand-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Originality & AI Scraper Alerts</span>
                 </li>
                 <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-brand-400" />
+                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
                   <span>Full CRM & Invoice Exporter</span>
                 </li>
               </ul>
@@ -605,38 +615,38 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
 
             <button
               onClick={onLaunchApp}
-              className="mt-8 w-full py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-brand-500/25 transition transform hover:-translate-y-0.5 z-20"
+              className="mt-8 w-full py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 text-xs font-bold shadow-[0_0_20px_rgba(255,255,255,0.2)] transition transform hover:-translate-y-0.5 z-20"
             >
               Launch Pro Workspace
             </button>
           </div>
 
           {/* Agency & Manager */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 flex flex-col justify-between">
+          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-7 flex flex-col justify-between">
             <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Manager & Agency</div>
+              <div className="text-[11px] font-mono font-bold text-slate-400 uppercase tracking-wider">Manager & Agency</div>
               <div className="text-3xl font-extrabold text-white mt-2 font-mono flex items-baseline space-x-1">
                 <RollingNumber value={billingCycle === 'annual' ? 59 : 79} prefix="$" />
                 <span className="text-xs text-slate-400 font-sans font-normal">/ month</span>
               </div>
               <p className="text-xs text-slate-400 mt-2">
                 {billingCycle === 'annual'
-                  ? 'Billed $708 annually. For agencies with multiple creator rosters.'
+                  ? 'Billed $708 annually. For teams & agencies.'
                   : 'Billed monthly. Scalable seats.'}
               </p>
 
-              <ul className="mt-6 space-y-3 text-xs text-slate-300">
+              <ul className="mt-6 space-y-2.5 text-xs text-slate-300">
                 <li className="flex items-center space-x-2">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Manage up to 10 Creator Rosters</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Multi-Creator Sponsor Matching & Comp Pricing</span>
+                  <span>Multi-Creator Sponsor Matching</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Automated Client PDF Executive Reports</span>
+                  <span>Automated Client PDF Reports</span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
@@ -647,7 +657,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
 
             <button
               onClick={onLaunchApp}
-              className="mt-8 w-full py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition"
+              className="mt-8 w-full py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-white text-xs font-semibold transition"
             >
               Start Agency Trial
             </button>
@@ -656,31 +666,34 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
       </FadeInWhenVisible>
 
       {/* FAQ Section with Physics Accordion */}
-      <FadeInWhenVisible className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <FadeInWhenVisible className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center space-y-3 mb-10">
-          <span className="text-xs font-bold text-brand-400 uppercase tracking-wider">Frequently Asked</span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Got Questions?</h2>
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+            <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">Frequently Asked</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Got Questions?</h2>
         </div>
 
-        <div className="space-y-3.5">
+        <div className="space-y-3">
           {faqs.map((faq, idx) => {
             const isOpen = activeFaq === idx;
             return (
               <div
                 key={idx}
-                className="rounded-xl border border-slate-800 bg-slate-900/60 overflow-hidden transition"
+                className="rounded-xl border border-white/[0.08] bg-[#0c0e14] overflow-hidden transition"
               >
                 <button
                   onClick={() => setActiveFaq(isOpen ? null : idx)}
-                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between space-x-4 hover:bg-slate-800/40 transition"
+                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between space-x-4 hover:bg-white/[0.02] transition"
                 >
-                  <span className="text-xs sm:text-sm font-bold text-slate-200">{faq.q}</span>
+                  <span className="text-xs sm:text-sm font-semibold text-slate-200">{faq.q}</span>
                   <motion.div
                     animate={{ rotate: isOpen ? 90 : 0 }}
                     transition={{ duration: 0.2 }}
                   >
                     <ChevronRight
-                      className={`w-4 h-4 ${isOpen ? 'text-brand-400' : 'text-slate-400'}`}
+                      className={`w-4 h-4 ${isOpen ? 'text-indigo-400' : 'text-slate-500'}`}
                     />
                   </motion.div>
                 </button>
@@ -693,7 +706,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
                       transition={{ duration: 0.25, ease: 'easeInOut' }}
                       className="overflow-hidden"
                     >
-                      <div className="px-4 pb-4 sm:px-5 sm:pb-5 text-xs text-slate-400 leading-relaxed border-t border-slate-800/60 pt-3">
+                      <div className="px-4 pb-4 sm:px-5 sm:pb-5 text-xs text-slate-400 leading-relaxed border-t border-white/[0.06] pt-3">
                         {faq.a}
                       </div>
                     </motion.div>
@@ -705,28 +718,28 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
         </div>
       </FadeInWhenVisible>
 
-      {/* Final Call to Action with Lift & Shimmer */}
+      {/* Final Call to Action Chamber */}
       <FadeInWhenVisible className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-3xl border border-brand-500/30 bg-gradient-to-r from-brand-950 via-slate-900 to-indigo-950 p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl">
-          <div className="absolute -top-24 -left-24 w-60 h-60 bg-brand-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="rounded-3xl border border-white/[0.1] bg-gradient-to-b from-[#0e111a] to-[#07090e] p-8 sm:p-14 text-center relative overflow-hidden shadow-2xl">
+          {/* Subtle Ambient top spotlight */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-32 bg-indigo-500/[0.08] blur-3xl pointer-events-none" />
 
           <div className="relative z-10 space-y-4 max-w-2xl mx-auto">
-            <span className="text-xs font-extrabold uppercase tracking-widest text-brand-300">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-indigo-400">
               Ready to take control?
             </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-              Stop letting algorithms dictate your livelihood.
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+              Stop letting opaque algorithms dictate your livelihood.
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
               Launch the Creator's workspace now to inspect your video drop-offs, scan monetization risks, and price your next brand deal accurately.
             </p>
             <div className="pt-4 flex justify-center">
               <button
                 onClick={onLaunchApp}
-                className="px-8 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-sm flex items-center space-x-2 shadow-xl transition transform hover:-translate-y-1 hover:shadow-brand-500/30"
+                className="h-12 px-8 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs flex items-center space-x-2 shadow-[0_0_30px_rgba(255,255,255,0.25)] transition transform hover:-translate-y-0.5"
               >
-                <span>Launch Creator's App</span>
+                <span>Launch Creator Workspace</span>
                 <ArrowRight className="w-4 h-4 text-slate-950" />
               </button>
             </div>

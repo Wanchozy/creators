@@ -128,16 +128,18 @@ export const AppShell: React.FC<AppShellProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col md:flex-row antialiased selection:bg-indigo-500 selection:text-white">
       {/* Mobile Bar */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-16 z-30">
-        <div className="flex items-center space-x-2">
-          <Sparkles className="w-4 h-4 text-brand-400" />
-          <span className="text-xs font-bold text-white uppercase tracking-wider">Creator Workspace</span>
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-white/[0.08] bg-[#0c0e14]/90 backdrop-blur-xl sticky top-0 z-30">
+        <div className="flex items-center space-x-2.5">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-[0_0_12px_rgba(99,102,241,0.4)]">
+            <Sparkles className="w-3.5 h-3.5 text-white" />
+          </div>
+          <span className="text-xs font-bold text-white tracking-wide">CREATOR'S OS</span>
         </div>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 text-slate-300 hover:text-white rounded-lg bg-slate-800 border border-slate-700"
+          className="p-2 text-slate-400 hover:text-white rounded-lg bg-white/[0.04] border border-white/[0.08]"
         >
           {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
@@ -145,39 +147,52 @@ export const AppShell: React.FC<AppShellProps> = ({
 
       {/* Sidebar Navigation */}
       <aside
-        className={`w-full md:w-64 shrink-0 bg-slate-950 border-r border-slate-800/80 p-4 space-y-6 flex flex-col justify-between ${
-          mobileMenuOpen ? 'block' : 'hidden md:flex'
+        className={`w-full md:w-64 shrink-0 bg-[#0a0c12] border-r border-white/[0.06] p-4 space-y-6 flex flex-col justify-between ${
+          mobileMenuOpen ? 'block fixed inset-x-0 top-14 bottom-0 z-50 overflow-y-auto bg-[#0a0c12]' : 'hidden md:flex'
         }`}
       >
-        <div className="space-y-6">
+        <div className="space-y-5">
           {/* Creator Channel Badge Card */}
-          <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800/90 flex items-center justify-between">
-            <div className="min-w-0 pr-2">
-              <div className="text-xs font-bold text-white truncate">
-                {profile.channelName || 'Creator Studio'}
+          <div className="p-3 rounded-xl bg-[#0f121a] border border-white/[0.08] hover:border-white/[0.15] transition flex items-center justify-between group">
+            <div className="flex items-center space-x-2.5 min-w-0 pr-1">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-xs text-white uppercase shrink-0 shadow-inner">
+                {(profile.channelName || 'C')[0]}
               </div>
-              <div className="text-[10px] text-slate-400 flex items-center space-x-1 font-mono">
-                <span className="capitalize">{profile.primaryPlatform}</span>
-                <span>•</span>
-                <span>{(profile.subscriberCount || 0).toLocaleString()} subs</span>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-white truncate group-hover:text-indigo-300 transition">
+                  {profile.channelName || 'Creator Studio'}
+                </div>
+                <div className="text-[10px] text-slate-400 flex items-center space-x-1 font-mono">
+                  <span className="capitalize">{profile.primaryPlatform}</span>
+                  <span className="text-slate-600">•</span>
+                  <span>{(profile.subscriberCount || 0).toLocaleString()} subs</span>
+                </div>
               </div>
             </div>
             <button
               onClick={() => setIsSettingsModalOpen(true)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] border border-transparent hover:border-white/[0.08] transition"
               title="Edit Channel Settings"
             >
-              <Settings className="w-4 h-4" />
+              <Settings className="w-3.5 h-3.5" />
             </button>
+          </div>
+
+          {/* Quick Command / Jump-to Bar */}
+          <div className="px-2.5 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] flex items-center justify-between text-slate-500 text-[11px] font-mono select-none">
+            <span className="truncate">Workspace Active</span>
+            <span className="px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-[10px] text-slate-400">
+              ⌘K
+            </span>
           </div>
 
           {/* Navigation Groups */}
           {navGroups.map((group) => (
-            <div key={group.group} className="space-y-1.5">
-              <div className="px-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                {group.group}
+            <div key={group.group} className="space-y-1">
+              <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                <span>{group.group}</span>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 {group.items.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
@@ -188,22 +203,25 @@ export const AppShell: React.FC<AppShellProps> = ({
                         setActiveTab(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-semibold transition ${
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition relative group ${
                         isActive
-                          ? 'bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md shadow-brand-500/15'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
+                          ? 'bg-white/[0.08] text-white border border-white/[0.08] shadow-[0_1px_4px_rgba(0,0,0,0.4)]'
+                          : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border border-transparent'
                       }`}
                     >
-                      <div className="flex items-center space-x-2.5">
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                        <span>{item.label}</span>
+                      {isActive && (
+                        <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                      )}
+                      <div className="flex items-center space-x-2.5 pl-0.5 min-w-0">
+                        <Icon className={`w-4 h-4 shrink-0 transition ${isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                        <span className="truncate">{item.label}</span>
                       </div>
                       {item.badge && (
                         <span
-                          className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                          className={`text-[9px] font-mono px-1.5 py-0.5 rounded shrink-0 transition ${
                             isActive
-                              ? 'bg-white/20 text-white'
-                              : 'bg-slate-900 text-slate-400 border border-slate-800'
+                              ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold'
+                              : 'bg-white/[0.03] text-slate-500 border border-white/[0.05]'
                           }`}
                         >
                           {item.badge}
@@ -218,53 +236,58 @@ export const AppShell: React.FC<AppShellProps> = ({
         </div>
 
         {/* Sidebar Footer Actions */}
-        <div className="pt-4 border-t border-slate-800 space-y-2">
+        <div className="pt-4 border-t border-white/[0.06] space-y-2">
           {isAuthenticated ? (
             <div className="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-400 flex items-center space-x-1.5">
               <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-              <span>Supabase RLS Protected</span>
+              <span className="font-mono">Supabase RLS Protected</span>
             </div>
           ) : (
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="w-full py-2 px-3 rounded-xl bg-brand-600/20 hover:bg-brand-600/30 border border-brand-500/40 text-xs font-semibold text-brand-300 flex items-center justify-center space-x-2 transition"
+              className="w-full py-2 px-3 rounded-lg bg-indigo-600/15 hover:bg-indigo-600/25 border border-indigo-500/30 text-xs font-semibold text-indigo-300 flex items-center justify-center space-x-2 transition"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Connect Account</span>
+              <span>Connect Supabase Account</span>
             </button>
           )}
 
           <button
             onClick={onNavigateToWebsite}
-            className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-semibold text-slate-300 flex items-center justify-center space-x-2 transition"
+            className="w-full py-2 px-3 rounded-lg bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center justify-center space-x-2 transition"
           >
-            <Globe className="w-3.5 h-3.5 text-brand-400" />
-            <span>Public Website & Features</span>
+            <Globe className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Public Site & Solutions</span>
           </button>
         </div>
       </aside>
 
       {/* Main Workspace Content Area */}
-      <main className="flex-1 flex flex-col min-w-0">
+      <main className="flex-1 flex flex-col min-w-0 bg-[#07090e] relative">
+        {/* Subtle Ambient Light at Top */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-36 bg-indigo-500/[0.03] blur-3xl pointer-events-none" />
+
         {/* Unauthenticated Sync Banner */}
         {!isAuthenticated && (
-          <div className="bg-gradient-to-r from-amber-500/10 via-brand-500/10 to-indigo-500/10 border-b border-amber-500/20 px-4 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
-            <div className="flex items-center space-x-2 text-slate-300">
-              <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>
-                <strong>Preview Mode:</strong> You are exploring with sample data. Sign in or register to persist all your deals, rates, and diagnostics to your private database.
+          <div className="bg-[#0e1018] border-b border-amber-500/20 px-4 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs relative z-10">
+            <div className="flex items-center space-x-2.5 text-slate-300">
+              <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[10px] font-bold uppercase tracking-wider shrink-0">
+                Sandbox Mode
+              </span>
+              <span className="text-slate-400">
+                Exploring with sample benchmarks. Link your account to save your CRM pipeline, rates, and diagnostics.
               </span>
             </div>
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="px-3 py-1 rounded-lg bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 transition shrink-0 shadow-sm"
+              className="px-3 py-1 rounded-md bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs transition shrink-0 shadow-sm"
             >
               Sign In to Save
             </button>
           </div>
         )}
 
-        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full flex-1">
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full flex-1 relative z-10">
           {activeTab === 'overview' && <OverviewDashboard onNavigateTab={setActiveTab} />}
           {activeTab === 'detective' && <AlgorithmDetectiveView />}
           {activeTab === 'scientist' && <CreatorScientistView />}
