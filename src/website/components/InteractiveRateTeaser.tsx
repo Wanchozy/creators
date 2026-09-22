@@ -1,16 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Calculator, CheckCircle2, ShieldCheck, ArrowRight, DollarSign, Sparkles, Trophy } from 'lucide-react';
+import {
+  Calculator,
+  CheckCircle2,
+  ShieldCheck,
+  ArrowRight,
+  DollarSign,
+  Sparkles,
+  Trophy,
+  Copy,
+  Check,
+  Zap,
+  Layers,
+  Sliders
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { calculateCreatorDealRate } from '@/shared/domain/rateCalculatorEngine';
 import { RollingNumber } from '@/shared/components/motion/RollingNumber';
 
 export const InteractiveRateTeaser: React.FC<{ onOpenFullApp?: () => void }> = ({ onOpenFullApp }) => {
-  const [avgViews, setAvgViews] = useState<number>(42000);
+  const [avgViews, setAvgViews] = useState<number>(45000);
   const [contentType, setContentType] = useState<'integration_60s' | 'dedicated_video' | 'ugc_ad'>('integration_60s');
   const [brandCanRepost, setBrandCanRepost] = useState<boolean>(true);
   const [paidAdvertisingRights, setPaidAdvertisingRights] = useState<boolean>(true);
   const [exclusivityDays, setExclusivityDays] = useState<number>(30);
+  const [copiedScript, setCopiedScript] = useState<boolean>(false);
 
   const prevPriceRef = useRef<number>(0);
 
@@ -32,17 +46,24 @@ export const InteractiveRateTeaser: React.FC<{ onOpenFullApp?: () => void }> = (
     if (result.recommendedPrice >= 5000 && prevPriceRef.current < 5000 && prevPriceRef.current > 0) {
       try {
         confetti({
-          particleCount: 50,
-          spread: 70,
+          particleCount: 45,
+          spread: 65,
           origin: { y: 0.6 },
-          colors: ['#6366f1', '#10b981', '#f59e0b', '#ec4899'],
+          colors: ['#6366f1', '#10b981', '#f59e0b', '#38bdf8'],
         });
       } catch {
-        // gracefully ignore if canvas context is unavailable
+        // ignore
       }
     }
     prevPriceRef.current = result.recommendedPrice;
   }, [result.recommendedPrice]);
+
+  const handleCopyClause = () => {
+    const clauseText = `Our quoted rate of $${result.recommendedPrice.toLocaleString()} accounts for both audience access and the commercial licensing requested. If your campaign does not require 30-day paid ad whitelisting rights, we can adjust the package by -$${result.breakdown.paidUsageMarkup.toLocaleString()}.`;
+    navigator.clipboard.writeText(clauseText);
+    setCopiedScript(true);
+    setTimeout(() => setCopiedScript(false), 2000);
+  };
 
   // Waterfall Bar percentages
   const total = Math.max(1, result.recommendedPrice);
@@ -52,35 +73,43 @@ export const InteractiveRateTeaser: React.FC<{ onOpenFullApp?: () => void }> = (
   const exclusivityPct = Math.round((result.breakdown.exclusivityPremium / total) * 100);
 
   return (
-    <div className="rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900/90 to-slate-950 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
-      <div className="absolute -top-24 -right-24 w-60 h-60 bg-brand-600/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-6 sm:p-8 shadow-[0_20px_60px_rgba(0,0,0,0.8)] relative overflow-hidden">
+      {/* Subtle top edge illumination */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-teal-500/30 to-transparent" />
+      <div className="absolute -top-24 right-1/4 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 pb-4 border-b border-slate-800 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-5 border-b border-white/[0.06] gap-4">
         <div>
-          <span className="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center space-x-1">
-            <Calculator className="w-3.5 h-3.5 mr-1" />
-            Live Deal & Rate Calculator
-          </span>
-          <h3 className="text-xl font-bold text-white mt-1">Not just: "50k followers = $500"</h3>
-          <p className="text-xs text-slate-400">
-            Calculate real commercial value: Usage Rights + Paid Ads + Exclusivity + Views
+          <div className="flex items-center space-x-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
+            <span className="text-[11px] font-mono font-bold text-teal-400 uppercase tracking-wider">
+              Commercial Deal Valuation Engine
+            </span>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-bold text-white mt-1.5 tracking-tight">
+            Not just "50k followers = $500"
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+            Prices actual commercial value: Base Production + Audience CPM + Paid Ad Rights + Lockouts.
           </p>
         </div>
-        <div className="text-left sm:text-right bg-slate-950/70 p-3 sm:p-0 rounded-xl sm:bg-transparent border sm:border-0 border-slate-800">
+
+        {/* Real-Time Recommended Quote Display */}
+        <div className="text-left sm:text-right bg-white/[0.02] sm:bg-transparent p-4 sm:p-0 rounded-xl border sm:border-0 border-white/[0.06]">
           <div className="text-xs text-slate-400 flex items-center sm:justify-end space-x-1.5">
-            <span>Recommended Quote</span>
+            <span>Recommended Deal Quote</span>
             {result.recommendedPrice >= 5000 && (
-              <span className="inline-flex items-center text-[10px] text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
-                <Trophy className="w-3 h-3 mr-0.5" /> High-Tier Deal
+              <span className="inline-flex items-center text-[10px] text-amber-300 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-mono">
+                <Trophy className="w-3 h-3 mr-1 text-amber-400" /> High-Tier
               </span>
             )}
           </div>
-          <div className="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300 font-mono">
+          <div className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-emerald-300 to-white font-mono tracking-tight my-0.5">
             <RollingNumber value={result.recommendedPrice} prefix="$" />
           </div>
-          <div className="text-[10px] text-slate-400 font-mono flex items-center sm:justify-end space-x-1">
-            <span>Range:</span>
+          <div className="text-[11px] text-slate-500 font-mono flex items-center sm:justify-end space-x-1">
+            <span>Market Range:</span>
             <RollingNumber value={result.minPrice} prefix="$" />
             <span>–</span>
             <RollingNumber value={result.maxPrice} prefix="$" />
@@ -88,15 +117,15 @@ export const InteractiveRateTeaser: React.FC<{ onOpenFullApp?: () => void }> = (
         </div>
       </div>
 
-      {/* Live Waterfall Bar */}
-      <div className="mb-6 space-y-2">
-        <div className="flex justify-between items-center text-xs text-slate-400">
-          <span className="font-semibold text-slate-300">Live Dynamic Stack Waterfall</span>
-          <span className="font-mono text-[11px] text-emerald-400">
-            100% transparent fee composition
-          </span>
+      {/* Live Waterfall Composition Bar */}
+      <div className="mb-8 p-4 rounded-xl bg-black/40 border border-white/[0.06] space-y-3">
+        <div className="flex justify-between items-center text-xs">
+          <span className="font-semibold text-slate-300">Audited Fee Stack Breakdown</span>
+          <span className="font-mono text-[11px] text-teal-400">100% itemized transparency</span>
         </div>
-        <div className="h-3.5 w-full bg-slate-950 rounded-full overflow-hidden flex border border-slate-800 p-0.5 space-x-0.5">
+
+        {/* Stacked Bar */}
+        <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden flex p-0.5 space-x-0.5 border border-white/[0.04]">
           <motion.div
             title={`Base Production: $${result.breakdown.baseCreationFee}`}
             className="h-full bg-slate-600 rounded-l-full"
@@ -105,63 +134,68 @@ export const InteractiveRateTeaser: React.FC<{ onOpenFullApp?: () => void }> = (
           />
           <motion.div
             title={`Audience Reach: $${result.breakdown.audienceAccessFee}`}
-            className="h-full bg-brand-500"
+            className="h-full bg-indigo-500"
             animate={{ width: `${audiencePct}%` }}
             transition={{ type: 'spring', stiffness: 120, damping: 20 }}
           />
           {paidAdvertisingRights && (
             <motion.div
-              title={`Paid Ad Rights: +$${result.breakdown.paidUsageMarkup}`}
-              className="h-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]"
+              title={`Paid Whitelisting: +$${result.breakdown.paidUsageMarkup}`}
+              className="h-full bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.5)]"
               animate={{ width: `${paidUsagePct}%` }}
               transition={{ type: 'spring', stiffness: 120, damping: 20 }}
             />
           )}
           {exclusivityDays > 0 && (
             <motion.div
-              title={`Exclusivity: +$${result.breakdown.exclusivityPremium}`}
+              title={`Category Exclusivity: +$${result.breakdown.exclusivityPremium}`}
               className="h-full bg-amber-400 rounded-r-full shadow-[0_0_8px_rgba(251,191,36,0.5)]"
               animate={{ width: `${exclusivityPct}%` }}
               transition={{ type: 'spring', stiffness: 120, damping: 20 }}
             />
           )}
         </div>
-        <div className="flex flex-wrap gap-3 text-[10px] text-slate-400 pt-0.5 font-mono">
-          <span className="flex items-center space-x-1">
+
+        {/* Legend */}
+        <div className="flex flex-wrap gap-4 text-[11px] text-slate-400 font-mono">
+          <div className="flex items-center space-x-1.5">
             <span className="w-2 h-2 rounded-full bg-slate-500 inline-block" />
-            <span>Production ({baseCreationPct}%)</span>
-          </span>
-          <span className="flex items-center space-x-1">
-            <span className="w-2 h-2 rounded-full bg-brand-500 inline-block" />
-            <span>Audience ({audiencePct}%)</span>
-          </span>
+            <span>Base Production (${result.breakdown.baseCreationFee})</span>
+          </div>
+          <div className="flex items-center space-x-1.5">
+            <span className="w-2 h-2 rounded-full bg-indigo-500 inline-block" />
+            <span>Audience Access (${result.breakdown.audienceAccessFee})</span>
+          </div>
           {paidAdvertisingRights && (
-            <span className="flex items-center space-x-1 text-emerald-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
-              <span>Paid Whitelisting ({paidUsagePct}%)</span>
-            </span>
+            <div className="flex items-center space-x-1.5 text-teal-300 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-teal-400 inline-block" />
+              <span>Paid Whitelisting (+${result.breakdown.paidUsageMarkup})</span>
+            </div>
           )}
           {exclusivityDays > 0 && (
-            <span className="flex items-center space-x-1 text-amber-300">
+            <div className="flex items-center space-x-1.5 text-amber-300 font-semibold">
               <span className="w-2 h-2 rounded-full bg-amber-400 inline-block" />
-              <span>Exclusivity ({exclusivityPct}%)</span>
-            </span>
+              <span>{exclusivityDays}d Lockout (+${result.breakdown.exclusivityPremium})</span>
+            </div>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Controls */}
-        <div className="space-y-4">
-          <div>
-            <div className="flex justify-between items-center text-xs font-semibold text-slate-300 mb-1.5">
-              <span>Your Average Views:</span>
+      {/* Grid: Controls & Negotiation Clause */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column: Interactive Inputs */}
+        <div className="lg:col-span-6 space-y-6">
+          {/* Slider with Quick Presets */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center text-xs">
+              <span className="font-semibold text-slate-300">Average Video Views</span>
               <RollingNumber
                 value={avgViews}
                 suffix=" views"
-                className="text-brand-400 font-mono font-bold"
+                className="text-teal-300 font-mono font-bold"
               />
             </div>
+            
             <input
               type="range"
               min="5000"
@@ -169,46 +203,45 @@ export const InteractiveRateTeaser: React.FC<{ onOpenFullApp?: () => void }> = (
               step="5000"
               value={avgViews}
               onChange={(e) => setAvgViews(Number(e.target.value))}
-              className="w-full accent-brand-500 bg-slate-800 h-2 rounded-lg cursor-pointer transition"
+              className="w-full accent-teal-400 bg-slate-800 h-2 rounded-lg cursor-pointer"
             />
-            {/* Quick preset buttons */}
-            <div className="flex justify-between items-center text-[10px] text-slate-400 mt-2">
-              <div className="space-x-1">
-                {[15000, 42000, 85000, 150000].map((preset) => (
+
+            <div className="flex items-center justify-between pt-1">
+              <div className="flex space-x-1.5">
+                {[15000, 45000, 100000, 200000].map((preset) => (
                   <button
                     key={preset}
                     onClick={() => setAvgViews(preset)}
-                    className={`px-2 py-0.5 rounded border transition ${
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-mono transition ${
                       avgViews === preset
-                        ? 'border-brand-500 bg-brand-500/20 text-brand-300 font-bold'
-                        : 'border-slate-800 bg-slate-900 hover:border-slate-700 text-slate-400'
+                        ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 font-bold'
+                        : 'bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.06]'
                     }`}
                   >
                     {preset / 1000}k
                   </button>
                 ))}
               </div>
-              <span className="text-slate-500">Max: 250k</span>
+              <span className="text-[11px] font-mono text-slate-500">Max: 250k</span>
             </div>
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5">
-              Deliverable Format:
-            </label>
+          {/* Deliverable Format Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-300 block">Deliverable Format</label>
             <div className="grid grid-cols-3 gap-2">
               {[
                 { id: 'integration_60s', label: '60s Integration' },
                 { id: 'dedicated_video', label: 'Dedicated Video' },
-                { id: 'ugc_ad', label: 'UGC Ad for Brand' },
+                { id: 'ugc_ad', label: 'Brand UGC Ad' },
               ].map((fmt) => (
                 <button
                   key={fmt.id}
                   onClick={() => setContentType(fmt.id as any)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium border text-center transition ${
+                  className={`p-2.5 rounded-xl text-xs font-medium border text-center transition ${
                     contentType === fmt.id
-                      ? 'border-brand-500 bg-brand-500/20 text-white shadow-sm ring-1 ring-brand-500/30 font-semibold'
-                      : 'border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200'
+                      ? 'border-teal-500/60 bg-teal-500/10 text-white font-semibold shadow-sm'
+                      : 'border-white/[0.06] bg-white/[0.02] text-slate-400 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
                   {fmt.label}
@@ -217,57 +250,67 @@ export const InteractiveRateTeaser: React.FC<{ onOpenFullApp?: () => void }> = (
             </div>
           </div>
 
-          <div className="pt-2 border-t border-slate-800/80 space-y-2.5">
-            <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
-              Commercial Rights:
+          {/* Commercial Rights Switches */}
+          <div className="space-y-3 pt-2 border-t border-white/[0.06]">
+            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block font-mono">
+              Commercial Licensing Clauses
             </label>
 
-            <label className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer hover:border-slate-700 transition">
-              <div className="flex items-center space-x-2.5">
-                <input
-                  type="checkbox"
-                  checked={paidAdvertisingRights}
-                  onChange={(e) => setPaidAdvertisingRights(e.target.checked)}
-                  className="rounded text-brand-600 focus:ring-brand-500 h-4 w-4 bg-slate-800 border-slate-700"
-                />
-                <div>
-                  <div className="text-xs font-semibold text-white">Paid Whitelisting / Ad Usage</div>
-                  <div className="text-[11px] text-slate-400">Brand puts ad spend behind your video</div>
-                </div>
+            {/* Whitelisting */}
+            <div
+              onClick={() => setPaidAdvertisingRights(!paidAdvertisingRights)}
+              className={`cursor-pointer p-3 rounded-xl border transition flex items-center justify-between ${
+                paidAdvertisingRights
+                  ? 'border-teal-500/40 bg-teal-500/[0.06]'
+                  : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1]'
+              }`}
+            >
+              <div>
+                <div className="text-xs font-semibold text-white">Paid Whitelisting Rights (30d)</div>
+                <div className="text-[11px] text-slate-400">Brand runs Meta/TikTok paid ads behind your handle</div>
               </div>
-              <span className="text-xs font-mono font-bold text-emerald-400">+40% value</span>
-            </label>
+              <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                paidAdvertisingRights ? 'bg-teal-500/20 text-teal-300' : 'text-slate-500'
+              }`}>
+                +35% value
+              </span>
+            </div>
 
-            <label className="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-900/50 cursor-pointer hover:border-slate-700 transition">
-              <div className="flex items-center space-x-2.5">
-                <input
-                  type="checkbox"
-                  checked={brandCanRepost}
-                  onChange={(e) => setBrandCanRepost(e.target.checked)}
-                  className="rounded text-brand-600 focus:ring-brand-500 h-4 w-4 bg-slate-800 border-slate-700"
-                />
-                <div>
-                  <div className="text-xs font-semibold text-white">Organic Brand Reposting</div>
-                  <div className="text-[11px] text-slate-400">Can reshare to their organic feed</div>
-                </div>
+            {/* Organic Repost */}
+            <div
+              onClick={() => setBrandCanRepost(!brandCanRepost)}
+              className={`cursor-pointer p-3 rounded-xl border transition flex items-center justify-between ${
+                brandCanRepost
+                  ? 'border-teal-500/40 bg-teal-500/[0.06]'
+                  : 'border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1]'
+              }`}
+            >
+              <div>
+                <div className="text-xs font-semibold text-white">Organic Brand Reposting</div>
+                <div className="text-[11px] text-slate-400">Can reshare video to their official brand channel</div>
               </div>
-              <span className="text-xs font-mono font-bold text-emerald-400">+15%</span>
-            </label>
+              <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                brandCanRepost ? 'bg-teal-500/20 text-teal-300' : 'text-slate-500'
+              }`}>
+                +15%
+              </span>
+            </div>
 
+            {/* Exclusivity Lockout */}
             <div className="flex items-center justify-between pt-1">
-              <span className="text-xs text-slate-400">Exclusivity Lockout:</span>
+              <span className="text-xs text-slate-400">Category Exclusivity Window:</span>
               <div className="flex items-center space-x-1.5">
                 {[0, 30, 60].map((days) => (
                   <button
                     key={days}
                     onClick={() => setExclusivityDays(days)}
-                    className={`px-2.5 py-1 rounded-md text-xs font-medium border transition ${
+                    className={`px-3 py-1 rounded-md text-xs font-mono transition ${
                       exclusivityDays === days
-                        ? 'border-brand-500 bg-brand-500/20 text-brand-300 font-bold'
-                        : 'border-slate-800 text-slate-400 hover:text-white'
+                        ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40 font-bold'
+                        : 'border border-white/[0.06] text-slate-400 hover:text-white bg-white/[0.02]'
                     }`}
                   >
-                    {days === 0 ? 'None' : `${days}d`}
+                    {days === 0 ? 'None' : `${days} days`}
                   </button>
                 ))}
               </div>
@@ -275,68 +318,62 @@ export const InteractiveRateTeaser: React.FC<{ onOpenFullApp?: () => void }> = (
           </div>
         </div>
 
-        {/* Live Commercial Breakdown Explanation */}
-        <div className="bg-slate-950/80 rounded-xl border border-slate-800 p-5 flex flex-col justify-between">
-          <div>
-            <div className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center justify-between">
-              <span>Why This Price?</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
-                Audited Formula
+        {/* Right Column: Negotiation Counter-Clause & Direct App Handoff */}
+        <div className="lg:col-span-6 bg-white/[0.02] border border-white/[0.08] rounded-xl p-5 flex flex-col justify-between space-y-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-300 flex items-center space-x-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-teal-400" />
+                <span>Audited Negotiation Clause</span>
               </span>
+              <button
+                onClick={handleCopyClause}
+                className="px-2.5 py-1 rounded-md bg-white/[0.06] hover:bg-white/[0.1] text-[11px] text-slate-300 flex items-center space-x-1.5 transition font-mono"
+              >
+                {copiedScript ? (
+                  <>
+                    <Check className="w-3 h-3 text-emerald-400" />
+                    <span className="text-emerald-400 font-bold">Copied to Clipboard</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3" />
+                    <span>Copy Clause</span>
+                  </>
+                )}
+              </button>
             </div>
 
-            <div className="space-y-2 mb-4">
-              <div className="flex justify-between text-xs py-1 border-b border-slate-800/60 text-slate-300">
-                <span>Base Production & Creation:</span>
-                <RollingNumber
-                  value={result.breakdown.baseCreationFee}
-                  prefix="$"
-                  className="font-mono text-white font-semibold"
-                />
-              </div>
-              <div className="flex justify-between text-xs py-1 border-b border-slate-800/60 text-slate-300">
-                <span>Audience Reach ({avgViews.toLocaleString()} views):</span>
-                <RollingNumber
-                  value={result.breakdown.audienceAccessFee}
-                  prefix="$"
-                  className="font-mono text-white font-semibold"
-                />
-              </div>
-              <div className="flex justify-between text-xs py-1 border-b border-slate-800/60 text-slate-300">
-                <span>Paid Ad / Whitelisting Rights:</span>
-                <RollingNumber
-                  value={result.breakdown.paidUsageMarkup}
-                  prefix="+$"
-                  className="font-mono text-emerald-400 font-semibold"
-                />
-              </div>
-              <div className="flex justify-between text-xs py-1 border-b border-slate-800/60 text-slate-300">
-                <span>Category Exclusivity ({exclusivityDays}d):</span>
-                <RollingNumber
-                  value={result.breakdown.exclusivityPremium}
-                  prefix="+$"
-                  className="font-mono text-amber-300 font-semibold"
-                />
-              </div>
-            </div>
-
-            <div className="bg-brand-950/40 border border-brand-800/40 rounded-lg p-3 text-[11px] text-brand-200 leading-relaxed space-y-1.5">
-              <div className="font-semibold text-brand-300 flex items-center">
-                <Sparkles className="w-3.5 h-3.5 mr-1 text-brand-400" />
-                Negotiation Counter-Clause:
-              </div>
-              <p>
-                "Our rate accounts for both audience distribution and the high-performing asset licensing requested. If your campaign does not require 30-day paid ad whitelisting, we can adjust the package by -${result.breakdown.paidUsageMarkup}."
+            {/* Negotiation Script Card */}
+            <div className="p-4 rounded-xl bg-black/50 border border-white/[0.06] font-mono text-xs text-slate-300 leading-relaxed space-y-2">
+              <p className="text-slate-200">
+                "Our quoted rate of <strong className="text-teal-300">${result.recommendedPrice.toLocaleString()}</strong> accounts for both audience reach and the commercial asset licensing requested.
               </p>
+              {paidAdvertisingRights && (
+                <p className="text-slate-400 text-[11px]">
+                  If your brand does not require 30-day paid ad whitelisting rights, we can adjust the package down by <span className="text-teal-400 font-semibold">-${result.breakdown.paidUsageMarkup.toLocaleString()}</span>."
+                </p>
+              )}
+            </div>
+
+            {/* Opportunity Recaptured Callout */}
+            <div className="p-3.5 rounded-xl bg-teal-500/[0.06] border border-teal-500/20 text-xs text-teal-200 flex items-center justify-between">
+              <div>
+                <span className="font-bold text-white block">Recaptured Deal Opportunity</span>
+                <span className="text-[11px] text-teal-300/90">Naive follower flat fee would have paid ~$600.</span>
+              </div>
+              <span className="font-mono text-base font-extrabold text-teal-300">
+                +${Math.max(400, result.recommendedPrice - 600).toLocaleString()}
+              </span>
             </div>
           </div>
 
           <button
             onClick={onOpenFullApp}
-            className="w-full mt-4 py-2.5 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white text-xs font-bold flex items-center justify-center space-x-2 shadow-lg shadow-brand-500/20 transition transform hover:-translate-y-0.5"
+            className="w-full h-11 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 transition shadow-lg shadow-teal-500/10"
           >
-            <span>Generate Pitch & Add to Deal Pipeline</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span>Generate Pitch & Push to Sponsorship CRM</span>
+            <ArrowRight className="w-3.5 h-3.5 text-slate-950" />
           </button>
         </div>
       </div>

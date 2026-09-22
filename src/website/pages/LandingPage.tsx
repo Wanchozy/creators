@@ -24,9 +24,9 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { InteractiveRateTeaser } from '../components/InteractiveRateTeaser';
 import { InteractiveDiagnosisTeaser } from '../components/InteractiveDiagnosisTeaser';
+import { HeroProductMockup } from '../components/HeroProductMockup';
 import {
   SpotlightCard,
-  FloatingCard,
   BorderBeam,
   FadeInWhenVisible,
   RollingNumber
@@ -186,109 +186,86 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
   return (
     <div className="space-y-24 pb-20 relative">
       {/* Hero Section */}
-      <section className="relative pt-16 pb-12 sm:pt-24 sm:pb-16 overflow-hidden">
-        {/* Ambient background glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-brand-600/20 via-indigo-600/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/3 right-10 w-[350px] h-[350px] bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-
+      <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-20 overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          {/* Floating Holographic Stat Badges */}
-          <div className="hidden lg:block">
-            <FloatingCard
-              delay={0}
-              duration={4}
-              yOffset={10}
-              className="absolute -top-6 left-2 z-20 max-w-[220px] rounded-xl border border-amber-500/30 bg-slate-900/90 p-2.5 text-left text-[11px]"
-            >
-              <div className="flex items-center space-x-1.5 text-amber-400 font-bold">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-                <span>Algorithm Shift Alert</span>
-              </div>
-              <p className="text-slate-300 mt-1">TikTok -22% Seed Cohort adjustment detected</p>
-            </FloatingCard>
-
-            <FloatingCard
-              delay={1.5}
-              duration={5}
-              yOffset={12}
-              className="absolute top-4 right-2 z-20 max-w-[230px] rounded-xl border border-emerald-500/30 bg-slate-900/90 p-2.5 text-left text-[11px]"
-            >
-              <div className="flex items-center space-x-1.5 text-emerald-400 font-bold">
-                <Check className="w-3.5 h-3.5" />
-                <span>Commercial Value Unlocked</span>
-              </div>
-              <p className="text-slate-300 mt-1">+$1,450 recaptured via paid ad whitelisting clause</p>
-            </FloatingCard>
-
-            <FloatingCard
-              delay={2.5}
-              duration={4.5}
-              yOffset={8}
-              className="absolute bottom-10 left-12 z-20 max-w-[210px] rounded-xl border border-rose-500/30 bg-slate-900/90 p-2.5 text-left text-[11px]"
-            >
-              <div className="flex items-center space-x-1.5 text-rose-400 font-bold">
-                <Activity className="w-3.5 h-3.5" />
-                <span>Retention Autopsy</span>
-              </div>
-              <p className="text-slate-300 mt-1">0:08s context lag cliff pinpointed</p>
-            </FloatingCard>
-          </div>
-
+          {/* Subtle Category Pill Badge */}
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-800 text-xs font-semibold text-brand-300 mb-6 shadow-sm backdrop-blur-sm"
+            transition={{ duration: 0.4 }}
+            className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-300 mb-6 shadow-sm backdrop-blur-md"
           >
-            <Sparkles className="w-3.5 h-3.5 text-brand-400" />
-            <span>The Creator Intelligence Category</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+            <span className="font-semibold text-slate-200">The Creator Intelligence Category</span>
+            <span className="text-slate-500 font-mono text-[11px]">v2.0</span>
           </motion.div>
 
+          {/* Headline */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.1] mb-6"
+            transition={{ duration: 0.5, delay: 0.08 }}
+            className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08] max-w-4xl mx-auto"
           >
             Stop guessing why your views collapsed.
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-indigo-300 to-emerald-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400">
               Understand the business of your content.
             </span>
           </motion.h1>
 
+          {/* Subtitle */}
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="max-w-3xl mx-auto text-base sm:text-xl text-slate-300 leading-relaxed mb-8"
+            transition={{ duration: 0.5, delay: 0.16 }}
+            className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed mt-6 mb-8 font-normal"
           >
-            You don't need another generic AI script generator. You need clarity: why an algorithm throttled your video, what to charge brands for paid ad rights, and how to protect yourself from demonetization.
+            Not another generic AI script generator. Direct causal diagnoses for algorithmic view drops, audited commercial rate pricing, and pre-upload monetization risk protection.
           </motion.p>
 
+          {/* CTA Group */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            transition={{ duration: 0.5, delay: 0.24 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-5"
           >
             <button
               onClick={onLaunchApp}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-sm flex items-center justify-center space-x-2 shadow-xl shadow-brand-500/25 transition-all transform hover:-translate-y-0.5"
+              className="w-full sm:w-auto h-12 px-7 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-sm flex items-center justify-center space-x-2 shadow-[0_0_30px_rgba(255,255,255,0.2)] transition transform hover:-translate-y-0.5"
             >
-              <span>Explore Interactive Creator Workspace</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Launch Creator Workspace</span>
+              <ArrowRight className="w-4 h-4 text-slate-950" />
             </button>
             <a
               href="#problems"
-              className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 font-semibold text-sm border border-slate-800 transition"
+              className="w-full sm:w-auto h-12 px-6 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-slate-300 font-semibold text-sm flex items-center justify-center transition"
             >
-              See the 10 Creator Solutions
+              <span>Explore 10 Solutions</span>
             </a>
           </motion.div>
 
-          {/* Social Proof / Stats Ticker with Rolling Numbers */}
-          <div className="mt-14 pt-8 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
+          <div className="text-[11px] text-slate-500 font-mono flex items-center justify-center space-x-2 mb-12">
+            <span>Zero channel write permissions required</span>
+            <span>•</span>
+            <span>Read-only benchmark modeling</span>
+            <span>•</span>
+            <span>Supabase RLS</span>
+          </div>
+
+          {/* The Linear-Style Interactive Product Showcase Mockup */}
+          <motion.div
+            initial={{ opacity: 0, y: 30, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mb-14"
+          >
+            <HeroProductMockup onOpenApp={(tab) => onNavigateToModule(tab || 'overview')} />
+          </motion.div>
+
+          {/* Social Proof / Key Performance Stats */}
+          <div className="pt-8 border-t border-white/[0.06] grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
             <div>
               <div className="text-2xl sm:text-3xl font-extrabold text-white font-mono">10</div>
               <div className="text-xs text-slate-400 mt-0.5">Core Creator Problems Solved</div>
