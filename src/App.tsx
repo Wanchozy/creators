@@ -7,6 +7,7 @@ import { OnboardingFlow } from '@/app/onboarding/OnboardingFlow';
 import { ToastProvider } from '@/shared/components/Toast';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useProfile } from '@/shared/hooks/useProfile';
+import { ScrollProgress, CursorSpotlight, TechBackground } from '@/shared/components/motion';
 
 export function App() {
   const { user } = useAuth();
@@ -66,7 +67,11 @@ export function App() {
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-white">
+      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-white relative">
+        <ScrollProgress />
+        <TechBackground />
+        <CursorSpotlight />
+
         {/* Only show global Navbar on Marketing and Workspace views. Onboarding has its own focused header. */}
         {currentView !== 'onboarding' && (
           <Navbar
