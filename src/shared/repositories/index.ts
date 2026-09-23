@@ -5,3 +5,4 @@ export * from './rateQuotesRepository';
 export * from './sponsorsRepository';
 export * from './profileRepository';
 export * from './copycatRepository';
+export * from './mediaKitRepository';

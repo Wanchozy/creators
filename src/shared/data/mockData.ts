@@ -7,7 +7,8 @@ import {
   PlatformChangeNotice,
   RepurposedClip,
   RevenueAnalyticsData,
-  SponsorshipDeal
+  SponsorshipDeal,
+  MediaKitProfile
 } from '@/shared/types';
 
 // Problem 1: Algorithm Detective mock data
@@ -534,3 +535,131 @@ export const mockDeals: SponsorshipDeal[] = [
     lastContactDate: 'Sep 28, 2026'
   }
 ];
+
+export const mockMediaKitProfile: MediaKitProfile = {
+  id: 'kit-demo-1',
+  channelName: 'Creator Studio',
+  handle: '@creatorstudio',
+  tagline: 'High-signal software breakdowns & creator engineering.',
+  bio: 'We help modern software engineers, indie creators, and founders understand tech architecture, business tools, and productivity workflows. Reaching 52,000+ dedicated weekly builders.',
+  niche: 'Tech & Modern Software',
+  contactEmail: 'partnerships@creatorstudio.dev',
+  verifiedBadge: true,
+  totalReach: 52000,
+  avgViews30d: 42000,
+  avgEngagementRate: 7.2,
+  platforms: [
+    {
+      platform: 'youtube',
+      handle: '@CreatorStudio',
+      followers: 52000,
+      avgViews: 42000,
+      engagementRate: 7.2
+    },
+    {
+      platform: 'tiktok',
+      handle: '@creatorstudio.clips',
+      followers: 24500,
+      avgViews: 68000,
+      engagementRate: 8.9
+    }
+  ],
+  demographics: {
+    topCountries: [
+      { country: 'United States', code: 'US', percentage: 48, cpmTier: 'Tier 1' },
+      { country: 'United Kingdom', code: 'GB', percentage: 18, cpmTier: 'Tier 1' },
+      { country: 'Canada', code: 'CA', percentage: 12, cpmTier: 'Tier 1' },
+      { country: 'Germany', code: 'DE', percentage: 9, cpmTier: 'Tier 1' },
+      { country: 'Kenya', code: 'KE', percentage: 7, cpmTier: 'Tier 2' },
+      { country: 'Other', code: 'WW', percentage: 6, cpmTier: 'Tier 3' }
+    ],
+    ageSplit: [
+      { range: '18-24', percentage: 22 },
+      { range: '25-34', percentage: 58 },
+      { range: '35-44', percentage: 15 },
+      { range: '45+', percentage: 5 }
+    ],
+    genderSplit: {
+      male: 71,
+      female: 27,
+      other: 2
+    }
+  },
+  pastBrands: [
+    {
+      id: 'pb-1',
+      name: 'NordVPN',
+      category: 'Cybersecurity',
+      campaignType: '60s Dedicated Mid-Roll',
+      metricHighlight: '480+ converted signups, 142k views',
+      verified: true
+    },
+    {
+      id: 'pb-2',
+      name: 'Linear App',
+      category: 'Developer Tools',
+      campaignType: 'Workflow Integration',
+      metricHighlight: '12.8% CTR on trackable link',
+      verified: true
+    },
+    {
+      id: 'pb-3',
+      name: 'Sony Electronics',
+      category: 'Camera Gear',
+      campaignType: 'Long-Form Showcase',
+      metricHighlight: '58k views, +24% over brand target',
+      verified: true
+    }
+  ],
+  ratePackages: [
+    {
+      id: 'pkg-1',
+      name: 'High-Impact Short Integration',
+      badge: 'Fast Turnaround',
+      deliverables: [
+        '1x 60s Vertical Short (YouTube / TikTok / Reels)',
+        'Pinned comment with trackable CTA link',
+        'Organic reposting permission (30 days)'
+      ],
+      price: 650,
+      turnaroundDays: 4,
+      includesWhitelisting: false,
+      whitelistingDays: 0
+    },
+    {
+      id: 'pkg-2',
+      name: 'Mid-Roll Integration + Whitelisting',
+      badge: 'Most Popular',
+      deliverables: [
+        '1x 60-90s Seamless Dedicated Mid-Roll Segment',
+        'Custom verbal call-to-action & screen overlay',
+        '30-day Paid Ad Whitelisting rights included',
+        '14-day direct category exclusivity lockout'
+      ],
+      price: 1800,
+      turnaroundDays: 7,
+      includesWhitelisting: true,
+      whitelistingDays: 30,
+      isPopular: true
+    },
+    {
+      id: 'pkg-3',
+      name: 'Full Campaign Showcase & 90-Day Rights',
+      badge: 'Maximum Reach',
+      deliverables: [
+        '1x Dedicated Long-form deep dive / review',
+        '2x Repurposed vertical teaser clips',
+        '90-day multi-platform paid performance ad rights',
+        '30-day complete category exclusivity',
+        'Full analytics report & attribution delivery at 14 days'
+      ],
+      price: 3600,
+      turnaroundDays: 14,
+      includesWhitelisting: true,
+      whitelistingDays: 90
+    }
+  ],
+  customPitchLink: 'https://creators.app/m/creatorstudio',
+  updatedAt: new Date().toISOString()
+};
+
