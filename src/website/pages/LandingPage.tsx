@@ -24,6 +24,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { InteractiveRateTeaser } from '../components/InteractiveRateTeaser';
 import { InteractiveDiagnosisTeaser } from '../components/InteractiveDiagnosisTeaser';
+import { InteractiveMediaKitTeaser } from '../components/InteractiveMediaKitTeaser';
 import { HeroProductMockup } from '../components/HeroProductMockup';
 import {
   SpotlightCard,
@@ -306,6 +307,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
         {/* Demo 2: Video Autopsy / Algorithm Detective */}
         <div>
           <InteractiveDiagnosisTeaser onOpenFullApp={() => onNavigateToModule('detective')} />
+        </div>
+
+        {/* Demo 3: Live Media Kit & Brand Pitch Studio */}
+        <div>
+          <InteractiveMediaKitTeaser onOpenFullApp={() => onNavigateToModule('media-kit')} />
         </div>
       </FadeInWhenVisible>
 
