@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard,
   TrendingDown,
@@ -18,7 +18,8 @@ import {
   Settings,
   ShieldCheck,
   LogIn,
-  AlertCircle
+  AlertCircle,
+  FileText
 } from 'lucide-react';
 import { useDeals } from '@/shared/hooks/useDeals';
 import { useAuth } from '@/shared/hooks/useAuth';
@@ -26,6 +27,7 @@ import { useProfile } from '@/shared/hooks/useProfile';
 import { useToast } from '@/shared/components/Toast';
 import { AuthModal } from '@/shared/components/AuthModal';
 import { ChannelSettingsModal } from '@/shared/components/ChannelSettingsModal';
+import { CommandPaletteModal } from '@/app/components/CommandPaletteModal';
 
 // Pillar 0: Command Center
 import { OverviewDashboard } from '@/app/views/OverviewDashboard';
@@ -42,6 +44,7 @@ import { PlatformChangeTrackerView } from '@/app/views/monetization/PlatformChan
 import { QualifiedRevenueAnalyticsView } from '@/app/views/monetization/QualifiedRevenueAnalyticsView';
 
 // Pillar 3: Deal & Business Hub
+import { MediaKitStudioView } from '@/app/views/deals/MediaKitStudioView';
 import { RateCalculatorView } from '@/app/views/deals/RateCalculatorView';
 import { SponsorRadarView } from '@/app/views/deals/SponsorRadarView';
 import { DealPipelineCRMView } from '@/app/views/deals/DealPipelineCRMView';
@@ -62,6 +65,18 @@ export const AppShell: React.FC<AppShellProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const { user, isConfigured } = useAuth();
   const { profile } = useProfile();
@@ -120,6 +135,7 @@ export const AppShell: React.FC<AppShellProps> = ({
     {
       group: 'Pillar 3: Deal & Business Hub',
       items: [
+        { id: 'media-kit', label: 'Media Kit & Pitches', icon: FileText, badge: 'One-Sheet' },
         { id: 'sponsor-radar', label: 'Sponsor Radar', icon: Briefcase, badge: 'Brand Finder' },
         { id: 'rate-calculator', label: 'Rate & Deal Calculator', icon: DollarSign, badge: 'Licensing' },
         { id: 'deal-crm', label: 'Sponsorship CRM', icon: Layers, badge: 'Kanban' },
@@ -179,12 +195,15 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
 
           {/* Quick Command / Jump-to Bar */}
-          <div className="px-2.5 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.06] flex items-center justify-between text-slate-500 text-[11px] font-mono select-none">
-            <span className="truncate">Workspace Active</span>
-            <span className="px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-[10px] text-slate-400">
+          <button
+            onClick={() => setIsCommandPaletteOpen(true)}
+            className="w-full px-2.5 py-1.5 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.06] hover:border-white/[0.12] flex items-center justify-between text-slate-400 hover:text-slate-200 text-[11px] font-mono select-none transition group text-left"
+          >
+            <span className="truncate group-hover:text-white transition">Quick Command...</span>
+            <span className="px-1.5 py-0.5 rounded bg-white/[0.04] border border-white/[0.08] text-[10px] text-slate-400 group-hover:text-indigo-300 group-hover:border-indigo-500/30 transition">
               ⌘K
             </span>
-          </div>
+          </button>
 
           {/* Navigation Groups */}
           {navGroups.map((group) => (
@@ -292,6 +311,9 @@ export const AppShell: React.FC<AppShellProps> = ({
           {activeTab === 'detective' && <AlgorithmDetectiveView />}
           {activeTab === 'scientist' && <CreatorScientistView />}
           {activeTab === 'originality' && <OriginalityMonitorView />}
+          {activeTab === 'media-kit' && (
+            <MediaKitStudioView onSendToCRM={(brand, val) => handleAddDealFromExternal(brand, val)} />
+          )}
           {activeTab === 'sponsor-radar' && (
             <SponsorRadarView onPitchCreated={(brand, val) => handleAddDealFromExternal(brand, val)} />
           )}
@@ -311,6 +333,13 @@ export const AppShell: React.FC<AppShellProps> = ({
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         onLaunchOnboarding={onLaunchOnboarding}
+      />
+      <CommandPaletteModal
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSelectTab={(tab) => setActiveTab(tab)}
+        onOpenSettings={() => setIsSettingsModalOpen(true)}
+        onNavigateToWebsite={onNavigateToWebsite}
       />
     </div>
   );
