@@ -20,13 +20,19 @@ import {
   ChevronRight,
   Activity,
   Check,
-  FileText
+  FileText,
+  Smartphone,
+  Apple,
+  QrCode
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InteractiveRateTeaser } from '../components/InteractiveRateTeaser';
 import { InteractiveDiagnosisTeaser } from '../components/InteractiveDiagnosisTeaser';
 import { InteractiveMediaKitTeaser } from '../components/InteractiveMediaKitTeaser';
-import { HeroProductMockup } from '../components/HeroProductMockup';
+import { HeroMobileMockup } from '../components/HeroMobileMockup';
+import { BentoGridShowcase } from '../components/BentoGridShowcase';
+import { OldWayComparison } from '../components/OldWayComparison';
+import { MobileDownloadModal } from '../components/MobileDownloadModal';
 import {
   SpotlightCard,
   BorderBeam,
@@ -45,6 +51,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'drops' | 'monetization' | 'deals'>('all');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [activeStoryStage, setActiveStoryStage] = useState<'cliff' | 'pricing' | 'mediakit'>('cliff');
+  const [isDownloadOpen, setIsDownloadOpen] = useState<boolean>(false);
+
 
   const problemSolutions = [
     {
@@ -191,8 +199,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
     <div className="space-y-24 pb-20 relative">
       {/* Hero Section */}
       <section className="relative pt-12 pb-16 sm:pt-20 sm:pb-20 overflow-hidden border-b border-white/[0.06]">
-        {/* Vercel-Style Precision Hairline Background Grid */}
-        <div className="absolute inset-0 bg-grid-hairline opacity-30 pointer-events-none" />
+        {/* Vercel-Style Precision Hairline Background Grid with Radial Mask */}
+        <div className="absolute inset-0 bg-grid-hairline opacity-30 radial-grid-mask pointer-events-none" />
         <div className="absolute inset-0 bg-radial-gradient pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -203,9 +211,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
             transition={{ duration: 0.4 }}
             className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-300 mb-6 shadow-sm backdrop-blur-md"
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-            <span className="font-semibold text-slate-200">The Creator Intelligence Category</span>
-            <span className="text-slate-500 font-mono text-[11px]">v2.0</span>
+            <Smartphone className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="font-semibold text-slate-200">Mobile Creator OS</span>
+            <span className="text-slate-500 font-mono text-[11px]">• iOS & Android Beta</span>
           </motion.div>
 
           {/* Headline */}
@@ -215,10 +223,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
             transition={{ duration: 0.5, delay: 0.08 }}
             className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.08] max-w-4xl mx-auto"
           >
-            Stop guessing why your views collapsed.
+            Stop guessing why your reach collapsed.
             <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400">
-              Understand the business of your content.
+              The creator operating system in your pocket.
             </span>
           </motion.h1>
 
@@ -229,7 +237,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
             transition={{ duration: 0.5, delay: 0.16 }}
             className="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed mt-6 mb-8 font-normal"
           >
-            Not another generic AI script generator. Direct causal diagnoses for algorithmic view drops, audited commercial rate pricing, and pre-upload monetization risk protection.
+            Direct causal diagnoses for algorithmic view drops, pre-upload camera-roll risk scanning, and pocket sponsor CRM anywhere you film.
           </motion.p>
 
           {/* CTA Group */}
@@ -240,37 +248,44 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
             className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-5"
           >
             <button
-              onClick={onLaunchApp}
+              onClick={() => setIsDownloadOpen(true)}
               className="w-full sm:w-auto h-12 px-7 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-sm flex items-center justify-center space-x-2 shadow-[0_0_30px_rgba(255,255,255,0.2)] transition transform hover:-translate-y-0.5"
             >
-              <span>Launch Creator Workspace</span>
-              <ArrowRight className="w-4 h-4 text-slate-950" />
+              <Apple className="w-4 h-4 text-slate-950" />
+              <span>Get for iOS & Android</span>
             </button>
             <a
-              href="#problems"
+              href="#bento"
               className="w-full sm:w-auto h-12 px-6 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.08] text-slate-300 font-semibold text-sm flex items-center justify-center transition"
             >
-              <span>Explore 10 Solutions</span>
+              <span>Explore Mobile Toolkit</span>
             </a>
+            <button
+              onClick={onLaunchApp}
+              className="w-full sm:w-auto h-12 px-5 rounded-xl border border-white/[0.06] hover:border-white/[0.12] bg-white/[0.01] hover:bg-white/[0.04] text-slate-400 hover:text-white text-xs font-mono flex items-center justify-center transition"
+            >
+              <span>Try Web Sandbox</span>
+            </button>
           </motion.div>
 
-          <div className="text-[11px] text-slate-500 font-mono flex items-center justify-center space-x-2 mb-12">
-            <span>Zero channel write permissions required</span>
+          <div className="text-[11px] text-slate-500 font-mono flex items-center justify-center space-x-2 mb-10">
+            <span>Camera Roll Pre-Flight</span>
             <span>•</span>
-            <span>Read-only benchmark modeling</span>
+            <span>Zero Channel Write Permissions</span>
             <span>•</span>
-            <span>Supabase RLS</span>
+            <span>Encrypted Local Storage</span>
           </div>
 
-          {/* The Linear-Style Interactive Product Showcase Mockup */}
+          {/* Raycast + Linear Flagship Hardware Mockup */}
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="mb-14"
+            className="mb-8"
           >
-            <HeroProductMockup onOpenApp={(tab) => onNavigateToModule(tab || 'overview')} />
+            <HeroMobileMockup />
           </motion.div>
+
 
           {/* Social Proof / Key Performance Stats */}
           <div className="pt-8 border-t border-white/[0.06] grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-4xl mx-auto text-center">
@@ -296,13 +311,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
         </div>
       </section>
 
+      {/* Vercel-Style Bento Grid Showcase */}
+      <BentoGridShowcase onOpenDownloadModal={() => setIsDownloadOpen(true)} />
+
       {/* Live Interactive Demos Section: Framer-Style 3-Act Storytelling Showcase */}
-      <FadeInWhenVisible className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        <div className="text-center space-y-3">
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span className="font-mono uppercase text-[11px] font-semibold">Interactive Sandbox</span>
-          </div>
+      <section id="simulator">
+        <FadeInWhenVisible className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span className="font-mono uppercase text-[11px] font-semibold">Interactive Sandbox</span>
+            </div>
+
           <h2 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
             See the Intelligence in Action
           </h2>
@@ -404,6 +424,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
           )}
         </AnimatePresence>
       </FadeInWhenVisible>
+    </section>
 
       {/* The 10 Core Problems & Solutions Grid */}
       <section id="problems" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -601,13 +622,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
         </div>
       </FadeInWhenVisible>
 
+      {/* Linear-Style Old Way vs. Intelligence Comparison */}
+      <OldWayComparison />
+
       {/* Transparent Pricing Plans */}
-      <FadeInWhenVisible className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-3 mb-8">
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-            <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">Predictable Pricing</span>
-          </div>
+      <section id="pricing">
+        <FadeInWhenVisible className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center space-y-3 mb-8">
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+              <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">Predictable Pricing</span>
+            </div>
+
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Invest in Creator Intelligence</h2>
           <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">
             One properly negotiated commercial usage-rights deal pays for Creator's for an entire decade.
@@ -796,6 +822,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
           </div>
         </div>
       </FadeInWhenVisible>
+    </section>
 
       {/* FAQ Section with Physics Accordion */}
       <FadeInWhenVisible className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -850,34 +877,54 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
         </div>
       </FadeInWhenVisible>
 
-      {/* Final Call to Action Chamber */}
+      {/* Final Call to Action Chamber: Mobile Launchpad */}
       <FadeInWhenVisible className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="rounded-3xl border border-white/[0.1] bg-gradient-to-b from-[#0e111a] to-[#07090e] p-8 sm:p-14 text-center relative overflow-hidden shadow-2xl">
           {/* Subtle Ambient top spotlight */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-32 bg-indigo-500/[0.08] blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-80 h-32 bg-indigo-500/[0.12] blur-3xl pointer-events-none" />
 
           <div className="relative z-10 space-y-4 max-w-2xl mx-auto">
-            <span className="text-[11px] font-mono font-bold uppercase tracking-widest text-indigo-400">
-              Ready to take control?
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-              Stop letting opaque algorithms dictate your livelihood.
+            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-mono text-indigo-400">
+              <Smartphone className="w-3.5 h-3.5" />
+              <span>Available on iOS & Android</span>
+            </div>
+            <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">
+              Get the Creator Operating System.
             </h2>
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Launch the Creator's workspace now to inspect your video drop-offs, scan monetization risks, and price your next brand deal accurately.
+            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-xl mx-auto">
+              Run causal autopsies, scan pre-upload policy risks, and lock in verified commercial sponsorships everywhere you film.
             </p>
-            <div className="pt-4 flex justify-center">
+            <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => setIsDownloadOpen(true)}
+                className="w-full sm:w-auto h-12 px-7 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 shadow-[0_0_30px_rgba(255,255,255,0.25)] transition transform hover:-translate-y-0.5"
+              >
+                <Apple className="w-4 h-4 text-slate-950" />
+                <span>Get for iOS & Android</span>
+              </button>
+              <button
+                onClick={() => setIsDownloadOpen(true)}
+                className="w-full sm:w-auto h-12 px-5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.08] text-slate-200 text-xs font-semibold flex items-center justify-center space-x-2 transition"
+              >
+                <QrCode className="w-4 h-4 text-slate-400" />
+                <span>Scan QR Code</span>
+              </button>
               <button
                 onClick={onLaunchApp}
-                className="h-12 px-8 rounded-xl bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs flex items-center space-x-2 shadow-[0_0_30px_rgba(255,255,255,0.25)] transition transform hover:-translate-y-0.5"
+                className="w-full sm:w-auto h-12 px-5 rounded-xl border border-white/[0.06] hover:border-white/[0.12] bg-white/[0.01] hover:bg-white/[0.04] text-slate-400 hover:text-white text-xs font-mono flex items-center justify-center transition"
               >
-                <span>Launch Creator Workspace</span>
-                <ArrowRight className="w-4 h-4 text-slate-950" />
+                <span>Try Web Sandbox</span>
               </button>
             </div>
           </div>
         </div>
       </FadeInWhenVisible>
+
+      {/* Mobile Download & TestFlight Modal */}
+      <MobileDownloadModal
+        isOpen={isDownloadOpen}
+        onClose={() => setIsDownloadOpen(false)}
+      />
     </div>
   );
 };
