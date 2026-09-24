@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   FileText,
   Share2,
@@ -167,20 +168,24 @@ export const MediaKitStudioView: React.FC<MediaKitStudioViewProps> = ({ onSendTo
       <div className="flex border-b border-white/[0.08] space-x-6 text-xs font-medium">
         <button
           onClick={() => setActiveTab('onesheet')}
-          className={`pb-3 flex items-center space-x-2 transition relative ${
+          className={`pb-3 flex items-center space-x-2 transition-colors relative ${
             activeTab === 'onesheet' ? 'text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Award className="w-4 h-4 text-indigo-400" />
           <span>Interactive One-Sheet</span>
           {activeTab === 'onesheet' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500 rounded-full" />
+            <motion.div
+              layoutId="mediaKitSubTab"
+              className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+              transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
+            />
           )}
         </button>
 
         <button
           onClick={() => setActiveTab('pitch_generator')}
-          className={`pb-3 flex items-center space-x-2 transition relative ${
+          className={`pb-3 flex items-center space-x-2 transition-colors relative ${
             activeTab === 'pitch_generator' ? 'text-white font-semibold' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -190,7 +195,11 @@ export const MediaKitStudioView: React.FC<MediaKitStudioViewProps> = ({ onSendTo
             Smart Scripts
           </span>
           {activeTab === 'pitch_generator' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500 rounded-full" />
+            <motion.div
+              layoutId="mediaKitSubTab"
+              className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+              transition={{ type: 'spring', bounce: 0.2, duration: 0.3 }}
+            />
           )}
         </button>
       </div>

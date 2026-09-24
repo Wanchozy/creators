@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Sparkles, LayoutDashboard, Globe, Bell, LogIn, Settings, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useProfile } from '@/shared/hooks/useProfile';
@@ -51,28 +52,42 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* View Switcher / Fast Nav */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            <div className="bg-slate-900/90 border border-slate-800 p-1 rounded-xl flex items-center shadow-inner">
+            <div className="bg-[#0c0e14] border border-white/[0.08] p-1 rounded-xl flex items-center shadow-inner relative">
               <button
                 onClick={() => setCurrentView('marketing')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`relative flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                   currentView === 'marketing'
-                    ? 'bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    ? 'text-white'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <Globe className="w-3.5 h-3.5" />
-                <span>Website & Features</span>
+                {currentView === 'marketing' && (
+                  <motion.div
+                    layoutId="navbarViewIndicator"
+                    className="absolute inset-0 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 shadow-md"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.3 }}
+                  />
+                )}
+                <Globe className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Website & Features</span>
               </button>
               <button
                 onClick={() => setCurrentView('app')}
-                className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`relative flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                   currentView === 'app'
-                    ? 'bg-gradient-to-r from-brand-600 to-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    ? 'text-white'
+                    : 'text-slate-400 hover:text-white'
                 }`}
               >
-                <LayoutDashboard className="w-3.5 h-3.5" />
-                <span>Launch Creator's App</span>
+                {currentView === 'app' && (
+                  <motion.div
+                    layoutId="navbarViewIndicator"
+                    className="absolute inset-0 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 shadow-md"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.3 }}
+                  />
+                )}
+                <LayoutDashboard className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Launch Creator's App</span>
               </button>
             </div>
 

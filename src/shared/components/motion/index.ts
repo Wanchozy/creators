@@ -6,3 +6,4 @@ export { SpotlightCard } from './SpotlightCard';
 export { FloatingCard } from './FloatingCard';
 export { BorderBeam } from './BorderBeam';
 export { FadeInWhenVisible } from './FadeInWhenVisible';
+export { SurfaceCard } from './SurfaceCard';

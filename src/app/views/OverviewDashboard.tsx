@@ -25,7 +25,7 @@ import { useDiagnostics } from '@/shared/hooks/useDiagnostics';
 import { useProfile } from '@/shared/hooks/useProfile';
 import { useRateQuotes } from '@/shared/hooks/useRateQuotes';
 import { useCopycats } from '@/shared/hooks/useCopycats';
-import { RollingNumber } from '@/shared/components/motion/RollingNumber';
+import { RollingNumber, SurfaceCard } from '@/shared/components/motion';
 
 interface OverviewDashboardProps {
   onNavigateTab: (tab: string) => void;
@@ -90,44 +90,44 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
       {/* 4 Linear-Style KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Deal Pipeline Value */}
-        <div
+        <SurfaceCard
           onClick={() => onNavigateTab('deal-crm')}
-          className="rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-5 hover:border-white/[0.15] transition cursor-pointer group shadow-sm hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+          className="p-5 hover:border-white/[0.18] transition-colors cursor-pointer group"
         >
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <span className="font-semibold text-slate-300">Active Deal Pipeline</span>
             <Layers className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-bold text-white font-mono tracking-tight group-hover:text-amber-300 transition">
+          <div className="text-2xl sm:text-3xl font-bold text-white font-mono tracking-tight group-hover:text-amber-300 transition-colors">
             <RollingNumber value={activeDealsValue} prefix="$" />
           </div>
           <div className="text-[11px] text-emerald-400 mt-2 flex items-center space-x-1 font-mono">
             <span>{activeDeals.length} deals in negotiation / production</span>
             <ArrowUpRight className="w-3 h-3" />
           </div>
-        </div>
+        </SurfaceCard>
 
         {/* Qualified Views RPM */}
-        <div
+        <SurfaceCard
           onClick={() => onNavigateTab('revenue-analytics')}
-          className="rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-5 hover:border-white/[0.15] transition cursor-pointer group shadow-sm hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+          className="p-5 hover:border-white/[0.18] transition-colors cursor-pointer group"
         >
           <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
             <span className="font-semibold text-slate-300">Qualified RPM (30d)</span>
             <BarChart3 className="w-4 h-4 text-emerald-400" />
           </div>
-          <div className="text-2xl sm:text-3xl font-bold text-emerald-400 font-mono tracking-tight group-hover:text-emerald-300 transition">
+          <div className="text-2xl sm:text-3xl font-bold text-emerald-400 font-mono tracking-tight group-hover:text-emerald-300 transition-colors">
             ${mockRevenueAnalytics.rpm.toFixed(2)}
           </div>
           <div className="text-[11px] text-slate-400 mt-2 font-mono">
             66% qualified views (168k / 255k views)
           </div>
-        </div>
+        </SurfaceCard>
 
         {/* Algorithm Alert */}
-        <div
+        <SurfaceCard
           onClick={() => onNavigateTab('detective')}
-          className="rounded-2xl border border-rose-500/30 bg-rose-500/[0.03] p-5 hover:border-rose-500/50 transition cursor-pointer group shadow-sm hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+          className="p-5 !border-rose-500/30 !bg-rose-500/[0.03] hover:!border-rose-500/50 transition-colors cursor-pointer group"
         >
           <div className="flex items-center justify-between text-xs text-rose-300 mb-2">
             <span className="font-semibold">Algorithm Velocity</span>
@@ -139,12 +139,12 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
           <div className="text-[11px] text-rose-300/80 mt-2 font-mono">
             {criticalVideo.views} views • 0:08s retention cliff
           </div>
-        </div>
+        </SurfaceCard>
 
         {/* Copycat Clones Alert */}
-        <div
+        <SurfaceCard
           onClick={() => onNavigateTab('originality')}
-          className="rounded-2xl border border-amber-500/30 bg-amber-500/[0.03] p-5 hover:border-amber-500/50 transition cursor-pointer group shadow-sm hover:shadow-[0_10px_30px_rgba(0,0,0,0.5)]"
+          className="p-5 !border-amber-500/30 !bg-amber-500/[0.03] hover:!border-amber-500/50 transition-colors cursor-pointer group"
         >
           <div className="flex items-center justify-between text-xs text-amber-300 mb-2">
             <span className="font-semibold">Copycat & Scraper Radar</span>
@@ -156,13 +156,13 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
           <div className="text-[11px] text-amber-300 mt-2 font-medium font-mono">
             {alerts.filter((a) => a.status === 'alert').length} require takedown action
           </div>
-        </div>
+        </SurfaceCard>
       </div>
 
       {/* Main Grid: Urgent Diagnostics & Active Pipeline */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left 7 Columns: Active Drop Autopsy */}
-        <div className="lg:col-span-7 rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-6 space-y-5">
+        <SurfaceCard className="lg:col-span-7 p-6 space-y-5">
           <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
@@ -237,10 +237,10 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
               </p>
             </div>
           </div>
-        </div>
+        </SurfaceCard>
 
         {/* Right 5 Columns: Active Brand Deal Pipeline & Alerts */}
-        <div className="lg:col-span-5 rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-6 space-y-5 flex flex-col justify-between">
+        <SurfaceCard className="lg:col-span-5 p-6 space-y-5 flex flex-col justify-between">
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-white/[0.06]">
               <div className="flex items-center space-x-2">
@@ -306,7 +306,7 @@ export const OverviewDashboard: React.FC<OverviewDashboardProps> = ({ onNavigate
             <Briefcase className="w-3.5 h-3.5 text-indigo-400" />
             <span>Discover High-Budget Sponsors in Niche</span>
           </button>
-        </div>
+        </SurfaceCard>
       </div>
     </div>
   );

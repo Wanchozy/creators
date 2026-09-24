@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   TrendingDown,
@@ -29,25 +30,28 @@ import { AuthModal } from '@/shared/components/AuthModal';
 import { ChannelSettingsModal } from '@/shared/components/ChannelSettingsModal';
 import { CommandPaletteModal } from '@/app/components/CommandPaletteModal';
 
-// Pillar 0: Command Center
-import { OverviewDashboard } from '@/app/views/OverviewDashboard';
+// Lazy-loaded workspace views — each tool becomes its own chunk
+const OverviewDashboard = lazy(() => import('@/app/views/OverviewDashboard').then((m) => ({ default: m.OverviewDashboard })));
+const AlgorithmDetectiveView = lazy(() => import('@/app/views/content-lab/AlgorithmDetectiveView').then((m) => ({ default: m.AlgorithmDetectiveView })));
+const CreatorScientistView = lazy(() => import('@/app/views/content-lab/CreatorScientistView').then((m) => ({ default: m.CreatorScientistView })));
+const OriginalityMonitorView = lazy(() => import('@/app/views/content-lab/OriginalityMonitorView').then((m) => ({ default: m.OriginalityMonitorView })));
+const SmartRecyclerView = lazy(() => import('@/app/views/content-lab/SmartRecyclerView').then((m) => ({ default: m.SmartRecyclerView })));
+const MonetizationRiskScannerView = lazy(() => import('@/app/views/monetization/MonetizationRiskScannerView').then((m) => ({ default: m.MonetizationRiskScannerView })));
+const PlatformChangeTrackerView = lazy(() => import('@/app/views/monetization/PlatformChangeTrackerView').then((m) => ({ default: m.PlatformChangeTrackerView })));
+const QualifiedRevenueAnalyticsView = lazy(() => import('@/app/views/monetization/QualifiedRevenueAnalyticsView').then((m) => ({ default: m.QualifiedRevenueAnalyticsView })));
+const MediaKitStudioView = lazy(() => import('@/app/views/deals/MediaKitStudioView').then((m) => ({ default: m.MediaKitStudioView })));
+const RateCalculatorView = lazy(() => import('@/app/views/deals/RateCalculatorView').then((m) => ({ default: m.RateCalculatorView })));
+const SponsorRadarView = lazy(() => import('@/app/views/deals/SponsorRadarView').then((m) => ({ default: m.SponsorRadarView })));
+const DealPipelineCRMView = lazy(() => import('@/app/views/deals/DealPipelineCRMView').then((m) => ({ default: m.DealPipelineCRMView })));
 
-// Pillar 1: Content Lab
-import { AlgorithmDetectiveView } from '@/app/views/content-lab/AlgorithmDetectiveView';
-import { CreatorScientistView } from '@/app/views/content-lab/CreatorScientistView';
-import { OriginalityMonitorView } from '@/app/views/content-lab/OriginalityMonitorView';
-import { SmartRecyclerView } from '@/app/views/content-lab/SmartRecyclerView';
-
-// Pillar 2: Monetization & Safety
-import { MonetizationRiskScannerView } from '@/app/views/monetization/MonetizationRiskScannerView';
-import { PlatformChangeTrackerView } from '@/app/views/monetization/PlatformChangeTrackerView';
-import { QualifiedRevenueAnalyticsView } from '@/app/views/monetization/QualifiedRevenueAnalyticsView';
-
-// Pillar 3: Deal & Business Hub
-import { MediaKitStudioView } from '@/app/views/deals/MediaKitStudioView';
-import { RateCalculatorView } from '@/app/views/deals/RateCalculatorView';
-import { SponsorRadarView } from '@/app/views/deals/SponsorRadarView';
-import { DealPipelineCRMView } from '@/app/views/deals/DealPipelineCRMView';
+/** Subtle spinner shown while a workspace view chunk loads */
+function ViewLoader() {
+  return (
+    <div className="flex items-center justify-center py-32">
+      <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
 
 interface AppShellProps {
   activeTab: string;
@@ -222,22 +226,33 @@ export const AppShell: React.FC<AppShellProps> = ({
                         setActiveTab(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition relative group ${
+                      className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium transition-colors relative group ${
                         isActive
-                          ? 'bg-white/[0.08] text-white border border-white/[0.08] shadow-[0_1px_4px_rgba(0,0,0,0.4)]'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03] border border-transparent'
+                          ? 'text-white'
+                          : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
                       }`}
                     >
                       {isActive && (
-                        <div className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                        <motion.div
+                          layoutId="sidebarActiveIndicator"
+                          className="absolute inset-0 rounded-lg bg-white/[0.08] border border-white/[0.08] shadow-[0_1px_4px_rgba(0,0,0,0.4)]"
+                          transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+                        />
                       )}
-                      <div className="flex items-center space-x-2.5 pl-0.5 min-w-0">
+                      {isActive && (
+                        <motion.div
+                          layoutId="sidebarActiveBar"
+                          className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.8)] z-10"
+                          transition={{ type: 'spring', bounce: 0.15, duration: 0.25 }}
+                        />
+                      )}
+                      <div className="flex items-center space-x-2.5 pl-0.5 min-w-0 relative z-10">
                         <Icon className={`w-4 h-4 shrink-0 transition ${isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
                         <span className="truncate">{item.label}</span>
                       </div>
                       {item.badge && (
                         <span
-                          className={`text-[9px] font-mono px-1.5 py-0.5 rounded shrink-0 transition ${
+                          className={`text-[9px] font-mono px-1.5 py-0.5 rounded shrink-0 transition relative z-10 ${
                             isActive
                               ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold'
                               : 'bg-white/[0.03] text-slate-500 border border-white/[0.05]'
@@ -307,24 +322,26 @@ export const AppShell: React.FC<AppShellProps> = ({
         )}
 
         <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full flex-1 relative z-10">
-          {activeTab === 'overview' && <OverviewDashboard onNavigateTab={setActiveTab} />}
-          {activeTab === 'detective' && <AlgorithmDetectiveView />}
-          {activeTab === 'scientist' && <CreatorScientistView />}
-          {activeTab === 'originality' && <OriginalityMonitorView />}
-          {activeTab === 'media-kit' && (
-            <MediaKitStudioView onSendToCRM={(brand, val) => handleAddDealFromExternal(brand, val)} />
-          )}
-          {activeTab === 'sponsor-radar' && (
-            <SponsorRadarView onPitchCreated={(brand, val) => handleAddDealFromExternal(brand, val)} />
-          )}
-          {activeTab === 'rate-calculator' && (
-            <RateCalculatorView onSendToCRM={(brand, amt) => handleAddDealFromExternal(brand, amt)} />
-          )}
-          {activeTab === 'risk-scanner' && <MonetizationRiskScannerView />}
-          {activeTab === 'platform-changes' && <PlatformChangeTrackerView />}
-          {activeTab === 'recycler' && <SmartRecyclerView />}
-          {activeTab === 'revenue-analytics' && <QualifiedRevenueAnalyticsView />}
-          {activeTab === 'deal-crm' && <DealPipelineCRMView />}
+          <Suspense fallback={<ViewLoader />}>
+            {activeTab === 'overview' && <OverviewDashboard onNavigateTab={setActiveTab} />}
+            {activeTab === 'detective' && <AlgorithmDetectiveView />}
+            {activeTab === 'scientist' && <CreatorScientistView />}
+            {activeTab === 'originality' && <OriginalityMonitorView />}
+            {activeTab === 'media-kit' && (
+              <MediaKitStudioView onSendToCRM={(brand, val) => handleAddDealFromExternal(brand, val)} />
+            )}
+            {activeTab === 'sponsor-radar' && (
+              <SponsorRadarView onPitchCreated={(brand, val) => handleAddDealFromExternal(brand, val)} />
+            )}
+            {activeTab === 'rate-calculator' && (
+              <RateCalculatorView onSendToCRM={(brand, amt) => handleAddDealFromExternal(brand, amt)} />
+            )}
+            {activeTab === 'risk-scanner' && <MonetizationRiskScannerView />}
+            {activeTab === 'platform-changes' && <PlatformChangeTrackerView />}
+            {activeTab === 'recycler' && <SmartRecyclerView />}
+            {activeTab === 'revenue-analytics' && <QualifiedRevenueAnalyticsView />}
+            {activeTab === 'deal-crm' && <DealPipelineCRMView />}
+          </Suspense>
         </div>
       </main>
 

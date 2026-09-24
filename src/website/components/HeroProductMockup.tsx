@@ -53,14 +53,19 @@ export const HeroProductMockup: React.FC<HeroProductMockupProps> = ({ onOpenApp 
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition ${
-                  isActive
-                    ? 'bg-white/10 text-white shadow-sm border border-white/10'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                className={`relative flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+                  isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
-                <Icon className="w-3 h-3" />
-                <span className="hidden sm:inline-block">{tab.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="mockupTabIndicator"
+                    className="absolute inset-0 rounded-md bg-white/10 border border-white/10 shadow-sm"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.3 }}
+                  />
+                )}
+                <Icon className="w-3 h-3 relative z-10" />
+                <span className="hidden sm:inline-block relative z-10">{tab.label}</span>
               </button>
             );
           })}
