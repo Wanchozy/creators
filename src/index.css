@@ -107,53 +107,6 @@ body {
   box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.16), 0 8px 30px -4px rgba(0, 0, 0, 0.7);
 }
 
-/* Vercel Radial Grid Mask */
-.radial-grid-mask {
-  mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, #000 60%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 0%, #000 60%, transparent 100%);
-}
-
-/* Raycast Luminous Ambient Glows */
-.raycast-glow-violet {
-  background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.18), transparent 70%);
-}
-
-.raycast-glow-crimson {
-  background: radial-gradient(circle at 50% 50%, rgba(244, 63, 94, 0.16), transparent 70%);
-}
-
-.raycast-glow-cyan {
-  background: radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.16), transparent 70%);
-}
-
-.raycast-glow-amber {
-  background: radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.16), transparent 70%);
-}
-
-/* Linear Specular Border & Bevel */
-.specular-border {
-  position: relative;
-}
-.specular-border::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.04) 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-/* Raycast Keycap Badges */
-.raycast-keycap {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
-}
-
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -162,6 +115,5 @@ body {
     transform: rotate(360deg);
   }
 }
-
 
 

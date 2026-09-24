@@ -5,7 +5,6 @@ import { useAuth } from '@/shared/hooks/useAuth';
 import { useProfile } from '@/shared/hooks/useProfile';
 import { AuthModal } from './AuthModal';
 import { ChannelSettingsModal } from './ChannelSettingsModal';
-import { MobileDownloadModal } from '@/website/components/MobileDownloadModal';
 
 interface NavbarProps {
   currentView: 'marketing' | 'app' | 'onboarding';
@@ -26,7 +25,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { profile } = useProfile();
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
-  const [isDownloadOpen, setIsDownloadOpen] = useState<boolean>(false);
 
   const isAuthenticated = Boolean(user && !user.isDemo);
   const channelDisplayName = profile?.channelName || user?.channelName || user?.displayName || 'Creator Studio';
@@ -53,56 +51,46 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Navigation Links for Marketing View */}
-          {currentView === 'marketing' ? (
-            <div className="hidden md:flex items-center space-x-6 text-xs font-medium text-slate-400">
-              <a href="#bento" className="hover:text-white transition-colors">
-                Mobile Toolkit
-              </a>
-              <a href="#features" className="hover:text-white transition-colors">
-                Architecture
-              </a>
-              <a href="#simulator" className="hover:text-white transition-colors">
-                Live Simulator
-              </a>
-              <a href="#pricing" className="hover:text-white transition-colors">
-                Pricing
-              </a>
-            </div>
-          ) : (
-            /* View Switcher inside App */
+          {/* View Switcher / Fast Nav */}
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <div className="bg-[#0c0e14] border border-white/[0.08] p-1 rounded-xl flex items-center shadow-inner relative">
               <button
                 onClick={() => setCurrentView('marketing')}
-                className="relative flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+                className={`relative flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                  currentView === 'marketing'
+                    ? 'text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
               >
-                <Globe className="w-3.5 h-3.5" />
-                <span>Return to Website</span>
+                {currentView === 'marketing' && (
+                  <motion.div
+                    layoutId="navbarViewIndicator"
+                    className="absolute inset-0 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 shadow-md"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.3 }}
+                  />
+                )}
+                <Globe className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Website & Features</span>
+              </button>
+              <button
+                onClick={() => setCurrentView('app')}
+                className={`relative flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                  currentView === 'app'
+                    ? 'text-white'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {currentView === 'app' && (
+                  <motion.div
+                    layoutId="navbarViewIndicator"
+                    className="absolute inset-0 rounded-lg bg-gradient-to-r from-brand-600 to-indigo-600 shadow-md"
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.3 }}
+                  />
+                )}
+                <LayoutDashboard className="w-3.5 h-3.5 relative z-10" />
+                <span className="relative z-10">Launch Creator's App</span>
               </button>
             </div>
-          )}
-
-          {/* Right Action Area */}
-          <div className="flex items-center space-x-2.5">
-            {currentView === 'marketing' ? (
-              <>
-                <button
-                  onClick={() => setIsDownloadOpen(true)}
-                  className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 text-xs font-bold flex items-center space-x-1.5 shadow-[0_0_20px_rgba(255,255,255,0.15)] transition transform hover:-translate-y-0.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>Get Mobile App</span>
-                </button>
-                <button
-                  onClick={() => setCurrentView('app')}
-                  className="hidden sm:inline-flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-slate-300 transition"
-                  title="Explore full interactive web workspace sandbox"
-                >
-                  <span>Web Sandbox</span>
-                </button>
-              </>
-            ) : null}
-
 
             {/* Auth / Profile Trigger */}
             <div className="flex items-center space-x-2 pl-2 border-l border-slate-800">
@@ -180,10 +168,6 @@ export const Navbar: React.FC<NavbarProps> = ({
           if (onLaunchOnboarding) onLaunchOnboarding();
           else setCurrentView('onboarding');
         }}
-      />
-      <MobileDownloadModal
-        isOpen={isDownloadOpen}
-        onClose={() => setIsDownloadOpen(false)}
       />
     </>
   );
