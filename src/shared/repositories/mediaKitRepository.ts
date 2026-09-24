@@ -5,15 +5,47 @@ import { createDefaultMediaKit } from '@/shared/domain/mediaKitEngine';
 import type { MediaKitProfile, UserProfile } from '@/shared/types';
 
 export interface MediaKitRepository {
-  fetchMediaKit(userId?: string): Promise<MediaKitProfile>;
-  saveMediaKit(userId: string, mediaKit: Partial<MediaKitProfile>): Promise<MediaKitProfile>;
-  resetMediaKit(userId: string, userProfile?: Partial<UserProfile>): Promise<MediaKitProfile>;
+  fetchMediaKit(creatorUserId?: string): Promise<MediaKitProfile>;
+  saveMediaKit(
+    creatorUserId: string,
+    profileUpdates: Partial<MediaKitProfile>
+  ): Promise<MediaKitProfile>;
+  resetMediaKit(
+    creatorUserId: string,
+    userProfile?: Partial<UserProfile>
+  ): Promise<MediaKitProfile>;
+}
+
+/**
+ * Isolated database schema representation for external PostgreSQL storage.
+ * Follows Rule 3 (Isolate External Systems).
+ */
+interface MediaKitDatabaseRow {
+  id?: string;
+  user_id?: string;
+  channel_name?: string;
+  handle?: string;
+  tagline?: string;
+  bio?: string;
+  niche?: string;
+  contact_email?: string;
+  avatar_url?: string;
+  verified_badge?: boolean;
+  total_reach?: number;
+  avg_views_30d?: number;
+  avg_engagement_rate?: number;
+  platforms?: MediaKitProfile['platforms'];
+  demographics?: MediaKitProfile['demographics'];
+  past_brands?: MediaKitProfile['pastBrands'];
+  rate_packages?: MediaKitProfile['ratePackages'];
+  custom_pitch_link?: string;
+  updated_at?: string;
 }
 
 // In-memory demo fallback store
-let _inMemoryMediaKit: MediaKitProfile = { ...mockMediaKitProfile };
+let _inMemoryMediaKitStore: MediaKitProfile = { ...mockMediaKitProfile };
 
-function mapRowToMediaKit(row: any): MediaKitProfile {
+function mapDatabaseRowToMediaKitProfile(row: MediaKitDatabaseRow): MediaKitProfile {
   return {
     id: row.id || 'kit-current',
     channelName: row.channel_name || 'Creator Studio',
@@ -36,105 +68,128 @@ function mapRowToMediaKit(row: any): MediaKitProfile {
   };
 }
 
-function mapMediaKitToRow(kit: Partial<MediaKitProfile>, userId?: string): Record<string, any> {
-  const row: Record<string, any> = {};
-  if (userId) row.user_id = userId;
-  if (kit.channelName !== undefined) row.channel_name = kit.channelName;
-  if (kit.handle !== undefined) row.handle = kit.handle;
-  if (kit.tagline !== undefined) row.tagline = kit.tagline;
-  if (kit.bio !== undefined) row.bio = kit.bio;
-  if (kit.niche !== undefined) row.niche = kit.niche;
-  if (kit.contactEmail !== undefined) row.contact_email = kit.contactEmail;
-  if (kit.avatarUrl !== undefined) row.avatar_url = kit.avatarUrl;
-  if (kit.verifiedBadge !== undefined) row.verified_badge = kit.verifiedBadge;
-  if (kit.totalReach !== undefined) row.total_reach = kit.totalReach;
-  if (kit.avgViews30d !== undefined) row.avg_views_30d = kit.avgViews30d;
-  if (kit.avgEngagementRate !== undefined) row.avg_engagement_rate = kit.avgEngagementRate;
-  if (kit.platforms !== undefined) row.platforms = kit.platforms;
-  if (kit.demographics !== undefined) row.demographics = kit.demographics;
-  if (kit.pastBrands !== undefined) row.past_brands = kit.pastBrands;
-  if (kit.ratePackages !== undefined) row.rate_packages = kit.ratePackages;
-  if (kit.customPitchLink !== undefined) row.custom_pitch_link = kit.customPitchLink;
-  row.updated_at = new Date().toISOString();
-  return row;
+function mapMediaKitProfileToDatabaseRow(
+  profileUpdates: Partial<MediaKitProfile>,
+  creatorUserId?: string
+): MediaKitDatabaseRow {
+  const databaseRow: MediaKitDatabaseRow = {};
+
+  if (creatorUserId) databaseRow.user_id = creatorUserId;
+  if (profileUpdates.channelName !== undefined) databaseRow.channel_name = profileUpdates.channelName;
+  if (profileUpdates.handle !== undefined) databaseRow.handle = profileUpdates.handle;
+  if (profileUpdates.tagline !== undefined) databaseRow.tagline = profileUpdates.tagline;
+  if (profileUpdates.bio !== undefined) databaseRow.bio = profileUpdates.bio;
+  if (profileUpdates.niche !== undefined) databaseRow.niche = profileUpdates.niche;
+  if (profileUpdates.contactEmail !== undefined) databaseRow.contact_email = profileUpdates.contactEmail;
+  if (profileUpdates.avatarUrl !== undefined) databaseRow.avatar_url = profileUpdates.avatarUrl;
+  if (profileUpdates.verifiedBadge !== undefined) databaseRow.verified_badge = profileUpdates.verifiedBadge;
+  if (profileUpdates.totalReach !== undefined) databaseRow.total_reach = profileUpdates.totalReach;
+  if (profileUpdates.avgViews30d !== undefined) databaseRow.avg_views_30d = profileUpdates.avgViews30d;
+  if (profileUpdates.avgEngagementRate !== undefined) databaseRow.avg_engagement_rate = profileUpdates.avgEngagementRate;
+  if (profileUpdates.platforms !== undefined) databaseRow.platforms = profileUpdates.platforms;
+  if (profileUpdates.demographics !== undefined) databaseRow.demographics = profileUpdates.demographics;
+  if (profileUpdates.pastBrands !== undefined) databaseRow.past_brands = profileUpdates.pastBrands;
+  if (profileUpdates.ratePackages !== undefined) databaseRow.rate_packages = profileUpdates.ratePackages;
+  if (profileUpdates.customPitchLink !== undefined) databaseRow.custom_pitch_link = profileUpdates.customPitchLink;
+
+  databaseRow.updated_at = new Date().toISOString();
+  return databaseRow;
 }
 
 export function createMediaKitRepository(client?: SupabaseClient): MediaKitRepository {
-  const isLive = hasSupabaseConfig();
-  const db = () => client ?? getSupabase();
+  const isSupabaseLive = hasSupabaseConfig();
+  const getDatabaseClient = () => client ?? getSupabase();
 
   return {
-    async fetchMediaKit(userId?: string): Promise<MediaKitProfile> {
-      if (!isLive || !userId) {
-        return { ..._inMemoryMediaKit };
+    async fetchMediaKit(creatorUserId?: string): Promise<MediaKitProfile> {
+      // Early return for sandbox or offline mode
+      if (!isSupabaseLive || !creatorUserId) {
+        return { ..._inMemoryMediaKitStore };
       }
 
       try {
-        const { data, error } = await db()
+        const { data: rawDatabaseRecord, error: queryError } = await getDatabaseClient()
           .from('media_kits')
           .select('*')
-          .eq('user_id', userId)
+          .eq('user_id', creatorUserId)
           .maybeSingle();
 
-        if (error) {
-          console.warn('[mediaKitRepository] fetch error, falling back to cache:', error.message);
-          return { ..._inMemoryMediaKit };
+        if (queryError) {
+          console.warn(
+            '[mediaKitRepository] Code: MEDIA_KIT_FETCH_ERROR. Retaining cached store:',
+            queryError.message
+          );
+          return { ..._inMemoryMediaKitStore };
         }
 
-        if (!data) {
-          return { ..._inMemoryMediaKit };
+        if (!rawDatabaseRecord) {
+          return { ..._inMemoryMediaKitStore };
         }
 
-        const mapped = mapRowToMediaKit(data);
-        _inMemoryMediaKit = mapped;
-        return mapped;
-      } catch (err) {
-        console.warn('[mediaKitRepository] network failure:', err);
-        return { ..._inMemoryMediaKit };
+        const normalizedProfile = mapDatabaseRowToMediaKitProfile(rawDatabaseRecord);
+        _inMemoryMediaKitStore = normalizedProfile;
+        return normalizedProfile;
+      } catch (unknownError) {
+        const safeErrorMessage =
+          unknownError instanceof Error ? unknownError.message : 'Unknown database network error';
+        console.warn(
+          '[mediaKitRepository] Code: MEDIA_KIT_NETWORK_ERROR. Retaining cached store:',
+          safeErrorMessage
+        );
+        return { ..._inMemoryMediaKitStore };
       }
     },
 
     async saveMediaKit(
-      userId: string,
-      updates: Partial<MediaKitProfile>
+      creatorUserId: string,
+      profileUpdates: Partial<MediaKitProfile>
     ): Promise<MediaKitProfile> {
-      const merged: MediaKitProfile = {
-        ..._inMemoryMediaKit,
-        ...updates,
+      const mergedProfile: MediaKitProfile = {
+        ..._inMemoryMediaKitStore,
+        ...profileUpdates,
         updatedAt: new Date().toISOString(),
       };
-      _inMemoryMediaKit = merged;
+      _inMemoryMediaKitStore = mergedProfile;
 
-      if (!isLive || !userId) {
-        return merged;
+      // Early return if not connected to live Supabase backend
+      if (!isSupabaseLive || !creatorUserId) {
+        return mergedProfile;
       }
 
       try {
-        const row = mapMediaKitToRow(merged, userId);
-        const { data, error } = await db()
+        const formattedDatabaseRow = mapMediaKitProfileToDatabaseRow(mergedProfile, creatorUserId);
+        const { data: upsertedRecord, error: upsertError } = await getDatabaseClient()
           .from('media_kits')
-          .upsert(row, { onConflict: 'user_id' })
+          .upsert(formattedDatabaseRow, { onConflict: 'user_id' })
           .select()
           .single();
 
-        if (error) {
-          console.warn('[mediaKitRepository] save error, retained in local cache:', error.message);
-          return merged;
+        if (upsertError) {
+          console.warn(
+            '[mediaKitRepository] Code: MEDIA_KIT_UPSERT_ERROR. Saved to in-memory store:',
+            upsertError.message
+          );
+          return mergedProfile;
         }
 
-        return mapRowToMediaKit(data);
-      } catch (err) {
-        console.warn('[mediaKitRepository] save network failure:', err);
-        return merged;
+        return mapDatabaseRowToMediaKitProfile(upsertedRecord);
+      } catch (unknownError) {
+        const safeErrorMessage =
+          unknownError instanceof Error ? unknownError.message : 'Unknown database network error';
+        console.warn(
+          '[mediaKitRepository] Code: MEDIA_KIT_UPSERT_NETWORK_FAILURE. Saved to in-memory store:',
+          safeErrorMessage
+        );
+        return mergedProfile;
       }
     },
 
     async resetMediaKit(
-      userId: string,
+      creatorUserId: string,
       userProfile?: Partial<UserProfile>
     ): Promise<MediaKitProfile> {
-      const fresh = createDefaultMediaKit(userProfile);
-      return this.saveMediaKit(userId, fresh);
+      const freshMediaKitProfile = createDefaultMediaKit(userProfile);
+      return this.saveMediaKit(creatorUserId, freshMediaKitProfile);
     },
   };
 }

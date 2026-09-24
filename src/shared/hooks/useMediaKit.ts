@@ -17,11 +17,15 @@ export function useMediaKit() {
     try {
       setLoading(true);
       setError(null);
-      const userId = getCurrentUserId();
-      const data = await mediaKitRepository.fetchMediaKit(userId);
-      setMediaKit(data);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to load media kit');
+      const authenticatedUserId = getCurrentUserId();
+      const fetchedMediaKit = await mediaKitRepository.fetchMediaKit(authenticatedUserId);
+      setMediaKit(fetchedMediaKit);
+    } catch (unknownError) {
+      const errorMessage =
+        unknownError instanceof Error
+          ? unknownError.message
+          : 'Failed to load media kit from repository.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -31,57 +35,75 @@ export function useMediaKit() {
     loadMediaKit();
   }, [loadMediaKit]);
 
-  const updateMediaKit = async (updates: Partial<MediaKitProfile>) => {
-    const previous = { ...mediaKit };
-    const optimistic: MediaKitProfile = {
+  const updateMediaKit = async (profileUpdates: Partial<MediaKitProfile>) => {
+    const previousSnapshot = { ...mediaKit };
+    const optimisticProfile: MediaKitProfile = {
       ...mediaKit,
-      ...updates,
+      ...profileUpdates,
       updatedAt: new Date().toISOString(),
     };
-    setMediaKit(optimistic);
+    setMediaKit(optimisticProfile);
 
     try {
       setSaving(true);
-      const userId = getCurrentUserId() || 'demo-user';
-      const saved = await mediaKitRepository.saveMediaKit(userId, updates);
-      setMediaKit(saved);
-    } catch (err: any) {
-      setMediaKit(previous);
-      setError(err?.message || 'Failed to save changes');
-      throw err;
+      const authenticatedUserId = getCurrentUserId() || 'demo-user';
+      const persistedProfile = await mediaKitRepository.saveMediaKit(
+        authenticatedUserId,
+        profileUpdates
+      );
+      setMediaKit(persistedProfile);
+    } catch (unknownError) {
+      setMediaKit(previousSnapshot);
+      const errorMessage =
+        unknownError instanceof Error
+          ? unknownError.message
+          : 'Failed to persist media kit changes.';
+      setError(errorMessage);
+      throw unknownError;
     } finally {
       setSaving(false);
     }
   };
 
-  const addPastBrand = async (brand: Omit<PastBrandSponsor, 'id'>) => {
-    const newBrand: PastBrandSponsor = {
-      ...brand,
+  const addPastBrand = async (brandData: Omit<PastBrandSponsor, 'id'>) => {
+    const verifiedBrandRecord: PastBrandSponsor = {
+      ...brandData,
       id: `pb-${Date.now()}`,
     };
-    const updatedBrands = [newBrand, ...mediaKit.pastBrands];
-    await updateMediaKit({ pastBrands: updatedBrands });
+    const updatedBrandList = [verifiedBrandRecord, ...mediaKit.pastBrands];
+    await updateMediaKit({ pastBrands: updatedBrandList });
   };
 
-  const removePastBrand = async (id: string) => {
-    const updatedBrands = mediaKit.pastBrands.filter((b) => b.id !== id);
-    await updateMediaKit({ pastBrands: updatedBrands });
+  const removePastBrand = async (sponsorBrandId: string) => {
+    const updatedBrandList = mediaKit.pastBrands.filter(
+      (sponsorRecord) => sponsorRecord.id !== sponsorBrandId
+    );
+    await updateMediaKit({ pastBrands: updatedBrandList });
   };
 
-  const updatePackage = async (pkg: RateCardPackage) => {
-    const updated = mediaKit.ratePackages.map((p) => (p.id === pkg.id ? pkg : p));
-    await updateMediaKit({ ratePackages: updated });
+  const updatePackage = async (targetPackage: RateCardPackage) => {
+    const updatedPackages = mediaKit.ratePackages.map((ratePackage) =>
+      ratePackage.id === targetPackage.id ? targetPackage : ratePackage
+    );
+    await updateMediaKit({ ratePackages: updatedPackages });
   };
 
   const syncWithChannelProfile = async () => {
     if (!profile) return;
-    const userId = getCurrentUserId() || 'demo-user';
+    const authenticatedUserId = getCurrentUserId() || 'demo-user';
     setSaving(true);
     try {
-      const reset = await mediaKitRepository.resetMediaKit(userId, profile);
-      setMediaKit(reset);
-    } catch (err: any) {
-      setError(err?.message || 'Failed to sync with channel profile');
+      const regeneratedProfile = await mediaKitRepository.resetMediaKit(
+        authenticatedUserId,
+        profile
+      );
+      setMediaKit(regeneratedProfile);
+    } catch (unknownError) {
+      const errorMessage =
+        unknownError instanceof Error
+          ? unknownError.message
+          : 'Failed to sync with channel profile baseline.';
+      setError(errorMessage);
     } finally {
       setSaving(false);
     }

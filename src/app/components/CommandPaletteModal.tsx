@@ -214,14 +214,14 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     [onSelectTab, onOpenSettings, onNavigateToWebsite, onClose]
   );
 
-  const filtered = useMemo(() => {
+  const filteredActions = useMemo(() => {
     if (!query.trim()) return actions;
-    const lower = query.toLowerCase();
+    const normalizedQuery = query.toLowerCase();
     return actions.filter(
-      (a) =>
-        a.title.toLowerCase().includes(lower) ||
-        a.category.toLowerCase().includes(lower) ||
-        a.badge?.toLowerCase().includes(lower)
+      (paletteAction) =>
+        paletteAction.title.toLowerCase().includes(normalizedQuery) ||
+        paletteAction.category.toLowerCase().includes(normalizedQuery) ||
+        paletteAction.badge?.toLowerCase().includes(normalizedQuery)
     );
   }, [actions, query]);
 
@@ -240,26 +240,27 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
   useEffect(() => {
     if (!isOpen) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+    const handleKeyDown = (keyboardEvent: KeyboardEvent) => {
+      if (keyboardEvent.key === 'Escape') {
         onClose();
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1) % (filtered.length || 1));
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 + filtered.length) % (filtered.length || 1));
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        if (filtered[selectedIndex]) {
-          filtered[selectedIndex].handler();
+      } else if (keyboardEvent.key === 'ArrowDown') {
+        keyboardEvent.preventDefault();
+        setSelectedIndex((prevIndex) => (prevIndex + 1) % (filteredActions.length || 1));
+      } else if (keyboardEvent.key === 'ArrowUp') {
+        keyboardEvent.preventDefault();
+        setSelectedIndex((prevIndex) => (prevIndex - 1 + filteredActions.length) % (filteredActions.length || 1));
+      } else if (keyboardEvent.key === 'Enter') {
+        keyboardEvent.preventDefault();
+        const selectedAction = filteredActions[selectedIndex];
+        if (selectedAction) {
+          selectedAction.handler();
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, filtered, selectedIndex, onClose]);
+  }, [isOpen, filteredActions, selectedIndex, onClose]);
 
   if (!isOpen) return null;
 
@@ -273,7 +274,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(inputChangeEvent) => setQuery(inputChangeEvent.target.value)}
             placeholder="Type a command or jump to tool... (e.g. Media Kit, CRM, Rate)"
             className="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none font-medium"
           />
@@ -287,19 +288,19 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
 
         {/* Results List */}
         <div className="max-h-80 overflow-y-auto p-2 space-y-1">
-          {filtered.length === 0 ? (
+          {filteredActions.length === 0 ? (
             <div className="py-8 text-center text-xs text-slate-500">
               No matching commands found for "{query}".
             </div>
           ) : (
-            filtered.map((item, idx) => {
-              const Icon = item.icon;
-              const isSelected = idx === selectedIndex;
+            filteredActions.map((paletteAction, actionIndex) => {
+              const ActionIcon = paletteAction.icon;
+              const isSelected = actionIndex === selectedIndex;
               return (
                 <button
-                  key={item.id}
-                  onClick={item.handler}
-                  onMouseEnter={() => setSelectedIndex(idx)}
+                  key={paletteAction.id}
+                  onClick={paletteAction.handler}
+                  onMouseEnter={() => setSelectedIndex(actionIndex)}
                   className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs transition text-left ${
                     isSelected
                       ? 'bg-indigo-600/20 text-white border border-indigo-500/30'
@@ -312,18 +313,18 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                         isSelected ? 'bg-indigo-500 text-white' : 'bg-white/[0.04] text-slate-400'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <ActionIcon className="w-4 h-4" />
                     </div>
                     <div className="truncate">
-                      <span className="font-semibold text-white">{item.title}</span>
+                      <span className="font-semibold text-white">{paletteAction.title}</span>
                       <span className="text-[10px] text-slate-500 ml-2 font-mono">
-                        {item.category}
+                        {paletteAction.category}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-2 shrink-0">
-                    {item.badge && (
+                    {paletteAction.badge && (
                       <span
                         className={`text-[9px] font-mono px-1.5 py-0.2 rounded ${
                           isSelected
@@ -331,7 +332,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
                             : 'bg-white/[0.04] text-slate-400'
                         }`}
                       >
-                        {item.badge}
+                        {paletteAction.badge}
                       </span>
                     )}
                     {isSelected && <ArrowRight className="w-3.5 h-3.5 text-indigo-400" />}

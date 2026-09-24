@@ -6,52 +6,79 @@ import {
 } from '@/shared/types';
 import { calculateCreatorDealRate } from './rateCalculatorEngine';
 
-/**
- * Calculates blended audience metrics and purchasing power index.
- */
-export function calculateAudienceReach(profile: Partial<MediaKitProfile>): {
+interface AudienceReachCalculationInput {
+  platforms?: MediaKitProfile['platforms'];
+  demographics?: AudienceDemographics;
+  totalReach?: number;
+  avgViews30d?: number;
+}
+
+interface AudienceReachCalculationOutput {
   totalReach: number;
   avgViews30d: number;
   tier1Percentage: number;
-} {
-  const platforms = profile.platforms || [];
-  const totalReach = platforms.reduce((acc, p) => acc + (p.followers || 0), 0);
-  const avgViews30d = platforms.reduce((acc, p) => acc + (p.avgViews || 0), 0);
+}
 
-  // Compute Tier 1 geography concentration (US, UK, CA, AU, DE)
-  const tier1Countries = ['US', 'GB', 'CA', 'AU', 'DE', 'NL'];
-  const demographics = profile.demographics;
-  let tier1Percentage = 0;
+/**
+ * Calculates blended audience metrics and Tier-1 purchasing power index.
+ */
+export function calculateAudienceReach(
+  creatorProfile: AudienceReachCalculationInput
+): AudienceReachCalculationOutput {
+  const activePlatforms = creatorProfile.platforms || [];
 
-  if (demographics?.topCountries) {
-    tier1Percentage = demographics.topCountries
-      .filter((c) => tier1Countries.includes(c.code.toUpperCase()) || c.cpmTier === 'Tier 1')
-      .reduce((sum, c) => sum + c.percentage, 0);
-  }
+  const calculatedTotalReach = activePlatforms.reduce(
+    (accumulatedFollowers, platformStat) => accumulatedFollowers + (platformStat.followers || 0),
+    0
+  );
+
+  const calculatedAvgViews = activePlatforms.reduce(
+    (accumulatedViews, platformStat) => accumulatedViews + (platformStat.avgViews || 0),
+    0
+  );
+
+  const tier1CountryCodes = new Set(['US', 'GB', 'CA', 'AU', 'DE', 'NL']);
+  const demographicCountries = creatorProfile.demographics?.topCountries || [];
+
+  const tier1AudiencePercentage = demographicCountries
+    .filter(
+      (countryMetric) =>
+        tier1CountryCodes.has(countryMetric.code.toUpperCase()) || countryMetric.cpmTier === 'Tier 1'
+    )
+    .reduce(
+      (accumulatedPercentage, countryMetric) => accumulatedPercentage + countryMetric.percentage,
+      0
+    );
+
+  const resolvedTotalReach =
+    calculatedTotalReach > 0 ? calculatedTotalReach : creatorProfile.totalReach || 45000;
+  const resolvedAvgViews =
+    calculatedAvgViews > 0 ? calculatedAvgViews : creatorProfile.avgViews30d || 18500;
 
   return {
-    totalReach: totalReach > 0 ? totalReach : profile.totalReach || 45000,
-    avgViews30d: avgViews30d > 0 ? avgViews30d : profile.avgViews30d || 18500,
-    tier1Percentage: Math.min(100, Math.round(tier1Percentage || 65)),
+    totalReach: resolvedTotalReach,
+    avgViews30d: resolvedAvgViews,
+    tier1Percentage: Math.min(100, Math.round(tier1AudiencePercentage || 65)),
   };
 }
 
 /**
- * Automatically synthesizes standard 3-tier rate packages from creator's baseline stats
+ * Synthesizes standard 3-tier sponsorship packages derived from verified channel benchmarks.
  */
 export function generateRecommendedRatePackages(
-  avgViews: number,
-  niche: string = 'Tech'
+  averageMonthlyViews: number,
+  contentNiche: string = 'Tech'
 ): RateCardPackage[] {
-  const views = Math.max(1000, avgViews || 20000);
+  const normalizedViews = Math.max(1000, averageMonthlyViews || 20000);
+  const estimatedFollowerAccess = Math.round(normalizedViews * 2.5);
 
   // Package 1: Starter Short/Shoutout
-  const shortRate = calculateCreatorDealRate({
+  const shortRateQuote = calculateCreatorDealRate({
     platform: 'youtube',
     contentType: 'short_form',
-    avgViews: views,
-    creatorFollowers: Math.round(views * 2.5),
-    category: niche,
+    avgViews: normalizedViews,
+    creatorFollowers: estimatedFollowerAccess,
+    category: contentNiche,
     brandCanRepost: true,
     paidAdvertisingRights: false,
     licensingMonths: 0,
@@ -60,12 +87,12 @@ export function generateRecommendedRatePackages(
   });
 
   // Package 2: Standard 60s Integration (Most Popular)
-  const integrationRate = calculateCreatorDealRate({
+  const integrationRateQuote = calculateCreatorDealRate({
     platform: 'youtube',
     contentType: 'integration_60s',
-    avgViews: views,
-    creatorFollowers: Math.round(views * 2.5),
-    category: niche,
+    avgViews: normalizedViews,
+    creatorFollowers: estimatedFollowerAccess,
+    category: contentNiche,
     brandCanRepost: true,
     paidAdvertisingRights: true,
     licensingMonths: 1,
@@ -74,12 +101,12 @@ export function generateRecommendedRatePackages(
   });
 
   // Package 3: Premium Multi-Platform Omnichannel Partnership
-  const dedicatedRate = calculateCreatorDealRate({
+  const dedicatedRateQuote = calculateCreatorDealRate({
     platform: 'youtube',
     contentType: 'dedicated_video',
-    avgViews: views,
-    creatorFollowers: Math.round(views * 2.5),
-    category: niche,
+    avgViews: normalizedViews,
+    creatorFollowers: estimatedFollowerAccess,
+    category: contentNiche,
     brandCanRepost: true,
     paidAdvertisingRights: true,
     licensingMonths: 3,
@@ -97,7 +124,7 @@ export function generateRecommendedRatePackages(
         'Pinned comment with trackable CTA link',
         'Organic reposting permission (30 days)',
       ],
-      price: shortRate.recommendedPrice,
+      price: shortRateQuote.recommendedPrice,
       turnaroundDays: 4,
       includesWhitelisting: false,
       whitelistingDays: 0,
@@ -112,7 +139,7 @@ export function generateRecommendedRatePackages(
         '30-day Paid Ad Whitelisting rights included',
         '14-day direct category exclusivity lockout',
       ],
-      price: integrationRate.recommendedPrice,
+      price: integrationRateQuote.recommendedPrice,
       turnaroundDays: 7,
       includesWhitelisting: true,
       whitelistingDays: 30,
@@ -129,7 +156,7 @@ export function generateRecommendedRatePackages(
         '30-day complete category exclusivity',
         'Full analytics report & attribution delivery at 14 days',
       ],
-      price: Math.round(dedicatedRate.recommendedPrice * 1.35),
+      price: Math.round(dedicatedRateQuote.recommendedPrice * 1.35),
       turnaroundDays: 14,
       includesWhitelisting: true,
       whitelistingDays: 90,
@@ -138,14 +165,14 @@ export function generateRecommendedRatePackages(
 }
 
 /**
- * Creates default initial Media Kit profile based on authenticated user settings
+ * Creates default initial Media Kit profile based on authenticated user settings.
  */
 export function createDefaultMediaKit(userProfile?: Partial<UserProfile>): MediaKitProfile {
-  const views = userProfile?.averageViews || 18500;
-  const subs = userProfile?.subscriberCount || 42000;
-  const channelName = userProfile?.channelName || 'Creator Studio';
-  const niche = userProfile?.niche || 'Technology & Creator Economy';
-  const platform = userProfile?.primaryPlatform || 'youtube';
+  const resolvedAverageViews = userProfile?.averageViews || 18500;
+  const resolvedSubscriberCount = userProfile?.subscriberCount || 42000;
+  const resolvedChannelName = userProfile?.channelName || 'Creator Studio';
+  const resolvedNiche = userProfile?.niche || 'Technology & Creator Economy';
+  const resolvedPrimaryPlatform = userProfile?.primaryPlatform || 'youtube';
 
   const defaultDemographics: AudienceDemographics = {
     topCountries: [
@@ -169,31 +196,33 @@ export function createDefaultMediaKit(userProfile?: Partial<UserProfile>): Media
     },
   };
 
+  const channelSlug = resolvedChannelName.toLowerCase().replace(/[^a-z0-9]/g, '');
+
   return {
     id: 'default-kit',
-    channelName,
-    handle: `@${channelName.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
+    channelName: resolvedChannelName,
+    handle: `@${channelSlug || 'creatorstudio'}`,
     tagline: 'High-signal technical breakdowns and product deep-dives.',
-    bio: `Partnering with forward-thinking SaaS, developer, and productivity brands. We build engaged audiences around practical workflows and clear software utility.`,
-    niche,
-    contactEmail: `business@${channelName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'creator'}.com`,
+    bio: 'Partnering with forward-thinking SaaS, developer, and productivity brands. We build engaged audiences around practical workflows and clear software utility.',
+    niche: resolvedNiche,
+    contactEmail: `business@${channelSlug || 'creator'}.com`,
     verifiedBadge: true,
-    totalReach: subs,
-    avgViews30d: views,
+    totalReach: resolvedSubscriberCount,
+    avgViews30d: resolvedAverageViews,
     avgEngagementRate: 6.4,
     platforms: [
       {
-        platform,
-        handle: `@${channelName.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
-        followers: subs,
-        avgViews: views,
+        platform: resolvedPrimaryPlatform,
+        handle: `@${channelSlug || 'creatorstudio'}`,
+        followers: resolvedSubscriberCount,
+        avgViews: resolvedAverageViews,
         engagementRate: 6.4,
       },
       {
         platform: 'tiktok',
-        handle: `@${channelName.toLowerCase().replace(/[^a-z0-9]/g, '')}_clips`,
-        followers: Math.round(subs * 0.4),
-        avgViews: Math.round(views * 1.8),
+        handle: `@${channelSlug || 'creatorstudio'}_clips`,
+        followers: Math.round(resolvedSubscriberCount * 0.4),
+        avgViews: Math.round(resolvedAverageViews * 1.8),
         engagementRate: 8.2,
       },
     ],
@@ -224,7 +253,7 @@ export function createDefaultMediaKit(userProfile?: Partial<UserProfile>): Media
         verified: true,
       },
     ],
-    ratePackages: generateRecommendedRatePackages(views, niche),
+    ratePackages: generateRecommendedRatePackages(resolvedAverageViews, resolvedNiche),
     updatedAt: new Date().toISOString(),
   };
 }

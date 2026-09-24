@@ -1,6 +1,6 @@
 import { ContractClauseRisk, ContractScanReport, RiskSeverity } from '@/shared/types';
 
-interface ClauseRule {
+interface ContractAuditRule {
   id: string;
   category: ContractClauseRisk['category'];
   severity: RiskSeverity;
@@ -10,7 +10,7 @@ interface ClauseRule {
   recommendedCounterClause: string;
 }
 
-const RED_FLAG_RULES: ClauseRule[] = [
+const RED_FLAG_AUDIT_RULES: ContractAuditRule[] = [
   {
     id: 'rule-perpetual',
     category: 'perpetual_rights',
@@ -92,11 +92,13 @@ const RED_FLAG_RULES: ClauseRule[] = [
 
 /**
  * Analyzes contract text or clauses and returns identified risks with counter-proposals.
+ * Follows Rule 1 (Early Return) and Rule 2 (Intentional Naming).
  */
-export function scanSponsorshipContract(contractText: string): ContractScanReport {
-  const text = contractText || '';
-  const wordCount = text.trim() ? text.trim().split(/\s+/).length : 0;
+export function scanSponsorshipContract(sponsorshipContractText: string): ContractScanReport {
+  const normalizedText = sponsorshipContractText?.trim() || '';
+  const wordCount = normalizedText.length > 0 ? normalizedText.split(/\s+/).length : 0;
 
+  // Early return for empty or non-contract input
   if (wordCount < 10) {
     return {
       safetyScore: 100,
@@ -110,51 +112,60 @@ export function scanSponsorshipContract(contractText: string): ContractScanRepor
     };
   }
 
-  const foundRisks: ContractClauseRisk[] = [];
+  const detectedRiskClauses: ContractClauseRisk[] = [];
 
-  for (const rule of RED_FLAG_RULES) {
-    const match = text.match(rule.pattern);
-    if (match) {
-      // Find a snippet around the match
-      const matchIndex = match.index || 0;
-      const start = Math.max(0, matchIndex - 40);
-      const end = Math.min(text.length, matchIndex + match[0].length + 60);
-      const snippet = text.slice(start, end).trim();
+  for (const auditRule of RED_FLAG_AUDIT_RULES) {
+    const matchedClause = normalizedText.match(auditRule.pattern);
+    if (matchedClause) {
+      const matchIndex = matchedClause.index || 0;
+      const snippetStartIndex = Math.max(0, matchIndex - 40);
+      const snippetEndIndex = Math.min(
+        normalizedText.length,
+        matchIndex + matchedClause[0].length + 60
+      );
+      const extractedSnippet = normalizedText.slice(snippetStartIndex, snippetEndIndex).trim();
 
-      foundRisks.push({
-        id: rule.id,
-        category: rule.category,
-        severity: rule.severity,
-        title: rule.title,
-        detectedSnippet: `"...${snippet}..."`,
-        dangerExplanation: rule.dangerExplanation,
-        recommendedCounterClause: rule.recommendedCounterClause,
+      detectedRiskClauses.push({
+        id: auditRule.id,
+        category: auditRule.category,
+        severity: auditRule.severity,
+        title: auditRule.title,
+        detectedSnippet: `"...${extractedSnippet}..."`,
+        dangerExplanation: auditRule.dangerExplanation,
+        recommendedCounterClause: auditRule.recommendedCounterClause,
       });
     }
   }
 
-  const criticalCount = foundRisks.filter((r) => r.severity === 'critical').length;
-  const highCount = foundRisks.filter((r) => r.severity === 'high').length;
-  const mediumCount = foundRisks.filter((r) => r.severity === 'medium').length;
+  const criticalRiskCount = detectedRiskClauses.filter(
+    (clause) => clause.severity === 'critical'
+  ).length;
+  const highRiskCount = detectedRiskClauses.filter(
+    (clause) => clause.severity === 'high'
+  ).length;
+  const mediumRiskCount = detectedRiskClauses.filter(
+    (clause) => clause.severity === 'medium'
+  ).length;
 
   // Calculate safety score (100 is pristine, penalize heavily for critical)
-  let penalty = criticalCount * 30 + highCount * 18 + mediumCount * 8;
-  const safetyScore = Math.max(10, 100 - penalty);
+  const totalRiskPenalty =
+    criticalRiskCount * 30 + highRiskCount * 18 + mediumRiskCount * 8;
+  const safetyScore = Math.max(10, 100 - totalRiskPenalty);
 
-  let verdict: ContractScanReport['verdict'] = 'safe_to_sign';
-  if (criticalCount > 0 || safetyScore < 50) {
-    verdict = 'predatory_do_not_sign';
-  } else if (highCount > 0 || mediumCount > 0 || safetyScore < 80) {
-    verdict = 'caution_negotiate_terms';
+  let auditVerdict: ContractScanReport['verdict'] = 'safe_to_sign';
+  if (criticalRiskCount > 0 || safetyScore < 50) {
+    auditVerdict = 'predatory_do_not_sign';
+  } else if (highRiskCount > 0 || mediumRiskCount > 0 || safetyScore < 80) {
+    auditVerdict = 'caution_negotiate_terms';
   }
 
   return {
     safetyScore,
-    criticalCount,
-    highCount,
-    mediumCount,
-    verdict,
-    foundRisks,
+    criticalCount: criticalRiskCount,
+    highCount: highRiskCount,
+    mediumCount: mediumRiskCount,
+    verdict: auditVerdict,
+    foundRisks: detectedRiskClauses,
     wordCount,
     scannedAt: new Date().toISOString(),
   };

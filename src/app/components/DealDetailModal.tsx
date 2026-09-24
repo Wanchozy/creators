@@ -144,17 +144,17 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
             <div>
               <label className="text-xs font-semibold text-slate-300 block mb-1.5">Deal Status Stage:</label>
               <div className="grid grid-cols-6 gap-1.5">
-                {stages.map((stg) => (
+                {stages.map((pipelineStage) => (
                   <button
-                    key={stg}
-                    onClick={() => onStageChange(deal.id, stg)}
+                    key={pipelineStage}
+                    onClick={() => onStageChange(deal.id, pipelineStage)}
                     className={`py-1.5 rounded-lg text-xs font-medium border text-center transition ${
-                      deal.stage === stg
+                      deal.stage === pipelineStage
                         ? 'border-indigo-500 bg-indigo-500/20 text-white font-bold shadow-sm'
                         : 'border-white/[0.08] bg-white/[0.02] text-slate-400 hover:text-white'
                     }`}
                   >
-                    {stg}
+                    {pipelineStage}
                   </button>
                 ))}
               </div>
@@ -166,10 +166,10 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                 <span className="font-bold text-slate-300 uppercase tracking-wider block text-[11px]">
                   Deliverables Checklist:
                 </span>
-                {deal.deliverables.map((del, i) => (
-                  <div key={i} className="flex items-center space-x-2 text-slate-200">
+                {deal.deliverables.map((deliverableItem, deliverableIndex) => (
+                  <div key={deliverableIndex} className="flex items-center space-x-2 text-slate-200">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>{del}</span>
+                    <span>{deliverableItem}</span>
                   </div>
                 ))}
                 <div className="text-slate-400 pt-1 border-t border-white/[0.06]">
@@ -290,11 +290,11 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
 
             {/* Identified Red-Flag Clauses */}
             <div className="space-y-3">
-              {scanReport.foundRisks.map((risk) => (
+              {scanReport.foundRisks.map((detectedRiskClause) => (
                 <div
-                  key={risk.id}
+                  key={detectedRiskClause.id}
                   className={`p-3.5 rounded-xl border text-xs space-y-2 ${
-                    risk.severity === 'critical'
+                    detectedRiskClause.severity === 'critical'
                       ? 'bg-rose-950/20 border-rose-500/30'
                       : 'bg-amber-950/20 border-amber-500/30'
                   }`}
@@ -303,27 +303,27 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                     <span className="font-bold text-white flex items-center space-x-1.5">
                       <AlertTriangle
                         className={`w-3.5 h-3.5 ${
-                          risk.severity === 'critical' ? 'text-rose-400' : 'text-amber-400'
+                          detectedRiskClause.severity === 'critical' ? 'text-rose-400' : 'text-amber-400'
                         }`}
                       />
-                      <span>{risk.title}</span>
+                      <span>{detectedRiskClause.title}</span>
                     </span>
                     <span
                       className={`text-[9px] uppercase font-mono px-1.5 py-0.5 rounded font-bold ${
-                        risk.severity === 'critical'
+                        detectedRiskClause.severity === 'critical'
                           ? 'bg-rose-500/20 text-rose-300'
                           : 'bg-amber-500/20 text-amber-300'
                       }`}
                     >
-                      {risk.severity} Risk
+                      {detectedRiskClause.severity} Risk
                     </span>
                   </div>
 
                   <div className="text-[11px] font-mono text-slate-300 bg-black/40 p-2 rounded border border-white/[0.04]">
-                    {risk.detectedSnippet}
+                    {detectedRiskClause.detectedSnippet}
                   </div>
 
-                  <p className="text-[11px] text-slate-300">{risk.dangerExplanation}</p>
+                  <p className="text-[11px] text-slate-300">{detectedRiskClause.dangerExplanation}</p>
 
                   <div className="pt-2 border-t border-white/[0.06] space-y-1.5">
                     <div className="flex items-center justify-between">
@@ -331,19 +331,19 @@ export const DealDetailModal: React.FC<DealDetailModalProps> = ({
                         Recommended Counter-Clause:
                       </span>
                       <button
-                        onClick={() => handleCopyCounter(risk.id, risk.recommendedCounterClause)}
+                        onClick={() => handleCopyCounter(detectedRiskClause.id, detectedRiskClause.recommendedCounterClause)}
                         className="px-2 py-0.5 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-[10px] font-semibold flex items-center space-x-1 transition"
                       >
-                        {copiedId === risk.id ? (
+                        {copiedId === detectedRiskClause.id ? (
                           <Check className="w-3 h-3 text-emerald-400" />
                         ) : (
                           <Copy className="w-3 h-3" />
                         )}
-                        <span>{copiedId === risk.id ? 'Copied' : 'Copy Counter-Clause'}</span>
+                        <span>{copiedId === detectedRiskClause.id ? 'Copied' : 'Copy Counter-Clause'}</span>
                       </button>
                     </div>
                     <div className="text-[11px] text-emerald-300 bg-emerald-950/30 p-2 rounded border border-emerald-500/20 leading-relaxed">
-                      {risk.recommendedCounterClause}
+                      {detectedRiskClause.recommendedCounterClause}
                     </div>
                   </div>
                 </div>

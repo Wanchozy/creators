@@ -280,22 +280,22 @@ export const MediaKitStudioView: React.FC<MediaKitStudioViewProps> = ({ onSendTo
               </div>
 
               <div className="space-y-2">
-                {mediaKit.pastBrands.map((b) => (
+                {mediaKit.pastBrands.map((sponsorBrand) => (
                   <div
-                    key={b.id}
+                    key={sponsorBrand.id}
                     className="p-2.5 rounded-lg bg-[#121622] border border-white/[0.06] flex items-center justify-between text-xs"
                   >
                     <div>
                       <div className="font-semibold text-white flex items-center space-x-1.5">
-                        <span>{b.name}</span>
+                        <span>{sponsorBrand.name}</span>
                         <span className="text-[9px] px-1.5 py-0.2 rounded bg-white/[0.05] text-slate-400">
-                          {b.category}
+                          {sponsorBrand.category}
                         </span>
                       </div>
-                      <div className="text-[10px] text-emerald-400 font-mono">{b.metricHighlight}</div>
+                      <div className="text-[10px] text-emerald-400 font-mono">{sponsorBrand.metricHighlight}</div>
                     </div>
                     <button
-                      onClick={() => removePastBrand(b.id)}
+                      onClick={() => removePastBrand(sponsorBrand.id)}
                       className="p-1 text-slate-500 hover:text-rose-400 transition"
                       title="Remove sponsor"
                     >
@@ -403,18 +403,18 @@ export const MediaKitStudioView: React.FC<MediaKitStudioViewProps> = ({ onSendTo
                     </span>
                   </div>
                   <div className="space-y-2">
-                    {mediaKit.demographics.topCountries.map((geo) => (
-                      <div key={geo.code} className="space-y-1">
+                    {mediaKit.demographics.topCountries.map((countryDemographic) => (
+                      <div key={countryDemographic.code} className="space-y-1">
                         <div className="flex justify-between text-[11px]">
                           <span className="text-slate-300 font-medium">
-                            {geo.country} ({geo.code})
+                            {countryDemographic.country} ({countryDemographic.code})
                           </span>
-                          <span className="text-slate-400 font-mono">{geo.percentage}%</span>
+                          <span className="text-slate-400 font-mono">{countryDemographic.percentage}%</span>
                         </div>
                         <div className="w-full h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
-                            style={{ width: `${geo.percentage * 1.8}%` }}
+                            style={{ width: `${countryDemographic.percentage * 1.8}%` }}
                           />
                         </div>
                       </div>
@@ -428,16 +428,16 @@ export const MediaKitStudioView: React.FC<MediaKitStudioViewProps> = ({ onSendTo
                     <span>Age & Viewer Profile</span>
                   </div>
                   <div className="space-y-2.5">
-                    {mediaKit.demographics.ageSplit.map((age) => (
-                      <div key={age.range} className="space-y-1">
+                    {mediaKit.demographics.ageSplit.map((ageBracket) => (
+                      <div key={ageBracket.range} className="space-y-1">
                         <div className="flex justify-between text-[11px]">
-                          <span className="text-slate-300">{age.range} years</span>
-                          <span className="text-slate-400 font-mono">{age.percentage}%</span>
+                          <span className="text-slate-300">{ageBracket.range} years</span>
+                          <span className="text-slate-400 font-mono">{ageBracket.percentage}%</span>
                         </div>
                         <div className="w-full h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-purple-500 rounded-full"
-                            style={{ width: `${age.percentage * 1.5}%` }}
+                            style={{ width: `${ageBracket.percentage * 1.5}%` }}
                           />
                         </div>
                       </div>
@@ -489,35 +489,35 @@ export const MediaKitStudioView: React.FC<MediaKitStudioViewProps> = ({ onSendTo
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {mediaKit.ratePackages.map((pkg) => (
+                  {mediaKit.ratePackages.map((rateCardPackage) => (
                     <div
-                      key={pkg.id}
+                      key={rateCardPackage.id}
                       className={`p-4 rounded-xl relative flex flex-col justify-between transition ${
-                        pkg.isPopular
+                        rateCardPackage.isPopular
                           ? 'bg-gradient-to-b from-indigo-950/40 to-[#0e111a] border-2 border-indigo-500/60 shadow-[0_0_20px_rgba(99,102,241,0.15)]'
                           : 'bg-[#090b12] border border-white/[0.08]'
                       }`}
                     >
-                      {pkg.badge && (
+                      {rateCardPackage.badge && (
                         <div className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-indigo-500 text-[9px] font-bold uppercase tracking-wider text-white shadow">
-                          {pkg.badge}
+                          {rateCardPackage.badge}
                         </div>
                       )}
 
                       <div className="space-y-3">
                         <div>
-                          <h4 className="text-xs font-bold text-white">{pkg.name}</h4>
+                          <h4 className="text-xs font-bold text-white">{rateCardPackage.name}</h4>
                           <div className="mt-2 flex items-baseline space-x-1">
-                            <span className="text-2xl font-black text-white">${pkg.price.toLocaleString()}</span>
+                            <span className="text-2xl font-black text-white">${rateCardPackage.price.toLocaleString()}</span>
                             <span className="text-[10px] text-slate-400">flat rate</span>
                           </div>
                         </div>
 
                         <div className="space-y-1.5 pt-2 border-t border-white/[0.06]">
-                          {pkg.deliverables.map((item, idx) => (
-                            <div key={idx} className="flex items-start space-x-1.5 text-[11px] text-slate-300">
+                          {rateCardPackage.deliverables.map((deliverableText, deliverableIndex) => (
+                            <div key={deliverableIndex} className="flex items-start space-x-1.5 text-[11px] text-slate-300">
                               <Check className="w-3 h-3 text-emerald-400 shrink-0 mt-0.5" />
-                              <span>{item}</span>
+                              <span>{deliverableText}</span>
                             </div>
                           ))}
                         </div>
@@ -526,10 +526,10 @@ export const MediaKitStudioView: React.FC<MediaKitStudioViewProps> = ({ onSendTo
                       <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-[10px] text-slate-400 font-mono">
                         <span className="flex items-center space-x-1">
                           <Clock className="w-3 h-3 text-indigo-400" />
-                          <span>{pkg.turnaroundDays}d turnaround</span>
+                          <span>{rateCardPackage.turnaroundDays}d turnaround</span>
                         </span>
-                        {pkg.includesWhitelisting && (
-                          <span className="text-indigo-400 font-semibold">+{pkg.whitelistingDays}d Whitelisting</span>
+                        {rateCardPackage.includesWhitelisting && (
+                          <span className="text-indigo-400 font-semibold">+{rateCardPackage.whitelistingDays}d Whitelisting</span>
                         )}
                       </div>
                     </div>

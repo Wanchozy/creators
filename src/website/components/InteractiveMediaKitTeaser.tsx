@@ -187,23 +187,23 @@ export const InteractiveMediaKitTeaser: React.FC<InteractiveMediaKitTeaserProps>
 
               {/* Dynamic Rates Generated */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {packages.map((pkg) => (
+                {packages.map((sponsorshipPackage) => (
                   <div
-                    key={pkg.id}
+                    key={sponsorshipPackage.id}
                     className={`p-3.5 rounded-xl border text-xs flex flex-col justify-between ${
-                      pkg.isPopular
-                        ? 'bg-indigo-950/30 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.1)]'
+                      sponsorshipPackage.isPopular
+                        ? 'bg-indigo-950/30 border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.15)]'
                         : 'bg-[#0f121d] border-white/[0.06]'
                     }`}
                   >
                     <div>
                       <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-mono">
-                        {pkg.name.split(' ')[0]} Placement
+                        {sponsorshipPackage.name.split(' ')[0]} Placement
                       </div>
                       <div className="text-xl font-extrabold text-white mt-1 font-mono">
-                        ${pkg.price.toLocaleString()}
+                        ${sponsorshipPackage.price.toLocaleString()}
                       </div>
-                      <p className="text-[10px] text-slate-400 mt-1 leading-snug">{pkg.deliverables[0]}</p>
+                      <p className="text-[10px] text-slate-400 mt-1 leading-snug">{sponsorshipPackage.deliverables[0]}</p>
                     </div>
 
                     <div className="pt-2 mt-2 border-t border-white/[0.04] text-[9px] font-mono text-emerald-400">
