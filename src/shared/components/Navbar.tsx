@@ -59,8 +59,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <a href="#bento" className="hover:text-white transition-colors">
                 Mobile Toolkit
               </a>
-              <a href="#problems" className="hover:text-white transition-colors">
-                10 Core Solutions
+              <a href="#features" className="hover:text-white transition-colors">
+                Architecture
               </a>
               <a href="#simulator" className="hover:text-white transition-colors">
                 Live Simulator

@@ -3,23 +3,9 @@ import {
   Sparkles,
   ArrowRight,
   TrendingDown,
-  Brain,
-  ShieldAlert,
-  Briefcase,
   DollarSign,
-  AlertTriangle,
-  RefreshCw,
-  Scissors,
-  BarChart3,
-  Layers,
   CheckCircle,
-  HelpCircle,
-  Zap,
-  Globe,
-  Star,
   ChevronRight,
-  Activity,
-  Check,
   FileText,
   Smartphone,
   Apple,
@@ -33,6 +19,7 @@ import { HeroMobileMockup } from '../components/HeroMobileMockup';
 import { BentoGridShowcase } from '../components/BentoGridShowcase';
 import { OldWayComparison } from '../components/OldWayComparison';
 import { MobileDownloadModal } from '../components/MobileDownloadModal';
+import { LinearBlueprintSection } from '../components/LinearBlueprintSection';
 import {
   SpotlightCard,
   BorderBeam,
@@ -48,129 +35,10 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigateToModule }) => {
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<'all' | 'drops' | 'monetization' | 'deals'>('all');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [activeStoryStage, setActiveStoryStage] = useState<'cliff' | 'pricing' | 'mediakit'>('cliff');
   const [isDownloadOpen, setIsDownloadOpen] = useState<boolean>(false);
 
-
-  const problemSolutions = [
-    {
-      num: '01',
-      category: 'drops',
-      problem: 'Sudden, unexplained drops in reach',
-      experience: 'Posts drop from 100k views to 424 views with zero clear explanation from studio charts.',
-      solution: 'Algorithm Detective',
-      desc: 'Pinpoints the exact drop-off reason: 8-second retention cliff, sub-baseline CTR, or seed cohort failure.',
-      tab: 'detective',
-      icon: TrendingDown,
-      color: 'text-rose-400 bg-rose-500/10 border-rose-500/20'
-    },
-    {
-      num: '02',
-      category: 'drops',
-      problem: "You have analytics, but don't know what to do with them",
-      experience: 'Data ≠ explanation. Video A got 80k views, Video B got 3k. What did you actually do differently?',
-      solution: 'Creator Scientist',
-      desc: 'Statistically compares your winning vs underperforming content to extract proven patterns (hook timing, face presence, length).',
-      tab: 'scientist',
-      icon: Brain,
-      color: 'text-purple-400 bg-purple-500/10 border-purple-500/20'
-    },
-    {
-      num: '03',
-      category: 'monetization',
-      problem: 'AI spam channels crowding out original creators',
-      experience: 'Low-effort automated channels scrape original scripts, titles, and concepts within hours.',
-      solution: 'Originality & Copy Monitor',
-      desc: 'Continuously monitors YouTube & TikTok for concept scrapers and alerts you with automated takedown scripts.',
-      tab: 'originality',
-      icon: ShieldAlert,
-      color: 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-    },
-    {
-      num: '04',
-      category: 'deals',
-      problem: 'Finding consistent sponsorships is painful',
-      experience: 'Creator & manager inbox mess trying to find brands with actual budget in their specific niche.',
-      solution: 'Sponsor Radar',
-      desc: 'Discovers active paying sponsors matching your exact audience niche and geography (US, UK, Kenya, etc.) with direct contact leads.',
-      tab: 'sponsor-radar',
-      icon: Briefcase,
-      color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
-    },
-    {
-      num: '05',
-      category: 'deals',
-      problem: "Creators don't know what to charge brands",
-      experience: 'Leaving thousands on the table by charging simple follower-count flat fees instead of pricing commercial rights.',
-      solution: 'Creator Rate Calculator',
-      desc: 'Calculates real commercial deal value: base production, audience access, paid ad whitelisting, and exclusivity lockouts.',
-      tab: 'rate-calculator',
-      icon: DollarSign,
-      color: 'text-teal-400 bg-teal-500/10 border-teal-500/20'
-    },
-    {
-      num: '06',
-      category: 'monetization',
-      problem: 'Monetization decisions feel unpredictable',
-      experience: 'Sudden demonetization strikes for "Inauthentic Content" or "Reused Content" with zero advance warning.',
-      solution: 'Monetization Risk Scanner',
-      desc: 'Pre-upload policy scanner detecting un-commentated third-party footage and template repetition before you publish.',
-      tab: 'risk-scanner',
-      icon: AlertTriangle,
-      color: 'text-red-400 bg-red-500/10 border-red-500/20'
-    },
-    {
-      num: '07',
-      category: 'monetization',
-      problem: 'Platform changes force constant adaptation',
-      experience: 'YouTube & TikTok shift algorithms and disclosure rules overnight, rendering old formats obsolete.',
-      solution: 'Platform Change Tracker',
-      desc: 'A unified feed of algorithm and policy shifts with personalized flags on which of your videos are affected.',
-      tab: 'platform-changes',
-      icon: RefreshCw,
-      color: 'text-blue-400 bg-blue-500/10 border-blue-500/20'
-    },
-    {
-      num: '08',
-      category: 'drops',
-      problem: 'Turning 1 long video into multi-platform clips is labor-intensive',
-      experience: 'Existing AI tools generate random boring snippets without understanding high-retention human tension.',
-      solution: 'Smart Content Recycler',
-      desc: '"Human chooses, AI accelerates." Identifies viral potential moments, tension quotes, and ready-to-publish vertical crops.',
-      tab: 'recycler',
-      icon: Scissors,
-      color: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20'
-    },
-    {
-      num: '09',
-      category: 'monetization',
-      problem: "Views aren't the same as money",
-      experience: '255k views on TikTok Creator Rewards yielding only 168k qualified views. Creators confused why RPM moves.',
-      solution: 'Qualified Revenue Analytics',
-      desc: 'Dissects your real monetizable views vs disqualifications, revealing what factors drove your RPM higher or lower.',
-      tab: 'revenue-analytics',
-      icon: BarChart3,
-      color: 'text-green-400 bg-green-500/10 border-green-500/20'
-    },
-    {
-      num: '10',
-      category: 'deals',
-      problem: 'Sponsorship administration is a chaotic mess',
-      experience: 'Managing 10-20 active deals across DMs, spreadsheets, lost contracts, and late invoice follow-ups.',
-      solution: 'Creator Deal Pipeline CRM',
-      desc: 'Visual Kanban pipeline tracking pitched, negotiating, active, and paid deals with automated reminders and invoice generation.',
-      tab: 'deal-crm',
-      icon: Layers,
-      color: 'text-amber-400 bg-amber-500/10 border-amber-500/20'
-    }
-  ];
-
-  const filteredProblems =
-    categoryFilter === 'all'
-      ? problemSolutions
-      : problemSolutions.filter((p) => p.category === categoryFilter);
 
   const faqs = [
     {
@@ -426,201 +294,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
       </FadeInWhenVisible>
     </section>
 
-      {/* The 10 Core Problems & Solutions Grid */}
-      <section id="problems" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center space-y-3 mb-8">
+      {/* Linear Architectural Blueprint Section (FIG 0.1, FIG 0.2, FIG 0.3) */}
+      <section id="features" className="w-full">
+        <div className="text-center space-y-3 mb-10 max-w-3xl mx-auto px-4">
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400">
             <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-            <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">Ground Truth Findings</span>
+            <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">Architectural System</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            10 Real Creator Headaches. 10 Direct Solutions.
+            Engineered for Creators. Not Guesswork.
           </h2>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-            Every feature in Creator's is built directly from actual community pain points—from TikTok Creator Rewards view qualification to YouTube 2026 demonetization policies.
+          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Linear-style architectural telemetry isolating distribution cliffs, camera-roll compliance, and commercial rights valuation.
           </p>
         </div>
 
-        {/* Category Filter Pills */}
-        <div className="flex items-center justify-center flex-wrap gap-2 mb-8">
-          {[
-            { id: 'all', label: 'All 10 Solutions' },
-            { id: 'drops', label: 'Algorithm & Drop-offs' },
-            { id: 'monetization', label: 'Monetization & Safety' },
-            { id: 'deals', label: 'Brand Deals & CRM' },
-          ].map((cat) => {
-            const active = categoryFilter === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => setCategoryFilter(cat.id as any)}
-                className={`relative px-4 py-2 rounded-xl text-xs font-semibold transition-colors ${
-                  active
-                    ? 'text-slate-950'
-                    : 'text-slate-400 hover:text-white bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08]'
-                }`}
-              >
-                {active && (
-                  <motion.div
-                    layoutId="categoryFilterPill"
-                    className="absolute inset-0 rounded-xl bg-white shadow-[0_0_20px_rgba(255,255,255,0.25)]"
-                    transition={{ type: 'spring', bounce: 0.15, duration: 0.3 }}
-                  />
-                )}
-                <span className="relative z-10">{cat.label}</span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Linear / Vercel Connected Hairline Solution Matrix */}
-        <div className="border border-white/[0.08] divide-y divide-white/[0.08] rounded-xl bg-[#090b10] overflow-hidden shadow-2xl">
-          <AnimatePresence>
-            {filteredProblems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={item.num}
-                  onClick={() => onNavigateToModule(item.tab)}
-                  className="p-5 sm:p-6 hover:bg-white/[0.02] transition-colors cursor-pointer group flex flex-col lg:flex-row lg:items-center justify-between gap-6"
-                >
-                  {/* Left: Problem & Symptom */}
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center space-x-2.5">
-                      <span className="text-xs font-mono font-bold text-slate-500">#{item.num}</span>
-                      <span className={`px-2.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold border flex items-center space-x-1.5 ${item.color}`}>
-                        <Icon className="w-3 h-3" />
-                        <span>{item.solution}</span>
-                      </span>
-                    </div>
-                    <h3 className="text-base sm:text-lg font-bold text-white group-hover:text-indigo-300 transition-colors">
-                      "{item.problem}"
-                    </h3>
-                    <p className="text-xs text-slate-400 font-mono">
-                      <span className="text-slate-500 font-bold">SYMPTOM: </span>
-                      {item.experience}
-                    </p>
-                  </div>
-
-                  {/* Right: Diagnosis & Direct Action Trigger */}
-                  <div className="lg:max-w-md lg:border-l lg:border-white/[0.06] lg:pl-6 space-y-2.5 shrink-0">
-                    <p className="text-xs text-slate-300 leading-relaxed">
-                      <span className="font-semibold text-white font-mono text-[11px]">DIAGNOSIS & FIX: </span>
-                      {item.desc}
-                    </p>
-                    <div className="flex items-center justify-between text-xs font-semibold text-indigo-400 group-hover:text-indigo-300 transition">
-                      <span className="font-mono text-[11px]">Launch {item.solution}</span>
-                      <div className="flex items-center space-x-1">
-                        <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] text-[10px] text-slate-400 font-mono">↵</kbd>
-                        <ChevronRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </AnimatePresence>
-        </div>
+        <LinearBlueprintSection />
       </section>
-
-      {/* The 3 Core Pillars */}
-      <FadeInWhenVisible className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0e14] p-8 sm:p-12 shadow-2xl relative overflow-hidden">
-          {/* Ambient Lighting Accent */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-40 bg-indigo-500/[0.06] blur-3xl pointer-events-none" />
-
-          <div className="text-center max-w-3xl mx-auto mb-12 relative z-10">
-            <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] text-xs text-slate-400 mb-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-              <span className="font-mono uppercase text-[11px] font-semibold text-slate-300">The Architectural Foundation</span>
-            </div>
-            <h2 className="text-3xl font-extrabold text-white tracking-tight">Built As Your Business & Content Operating System</h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-2">
-              Three interconnected pillars supporting creators from their first 10,000 views to six-figure commercial partnerships.
-            </p>
-          </div>
-
-          <div className="border border-white/[0.08] divide-y md:divide-y-0 md:divide-x divide-white/[0.08] rounded-xl bg-[#080a0f] overflow-hidden grid grid-cols-1 md:grid-cols-3 relative z-10 shadow-2xl">
-            <div className="p-6 sm:p-8 space-y-4 hover:bg-white/[0.01] transition-colors flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 mb-3">
-                  <Brain className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-bold text-white">Pillar 1: Content Intelligence</h3>
-                <p className="text-xs text-slate-400 leading-relaxed mt-1.5">
-                  Replaces mysterious algorithm panic with diagnostic rigor. Explains why high-effort videos die, mines your top uploads for winning traits, and catches AI channels copying your work.
-                </p>
-              </div>
-              <ul className="text-xs text-slate-300 space-y-2 pt-4 border-t border-white/[0.06]">
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Algorithm Detective (Drop Autopsy)</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Creator Scientist (Formula Finder)</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Originality & Scraping Monitor</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="p-6 sm:p-8 space-y-4 hover:bg-white/[0.01] transition-colors flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mb-3">
-                  <ShieldAlert className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-bold text-white">Pillar 2: Monetization & Safety</h3>
-                <p className="text-xs text-slate-400 leading-relaxed mt-1.5">
-                  Protects your revenue engine. Pre-screens videos against 2026 reused-content policies, demystifies RPM fluctuations, and alerts you to platform rule updates.
-                </p>
-              </div>
-              <ul className="text-xs text-slate-300 space-y-2 pt-4 border-t border-white/[0.06]">
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Pre-Publish Monetization Scanner</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Qualified vs Raw Views Funnel</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Platform Changes Impact Feed</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="p-6 sm:p-8 space-y-4 hover:bg-white/[0.01] transition-colors flex flex-col justify-between">
-              <div>
-                <div className="w-10 h-10 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mb-3">
-                  <DollarSign className="w-5 h-5" />
-                </div>
-                <h3 className="text-base font-bold text-white">Pillar 3: Deal & Business Hub</h3>
-                <p className="text-xs text-slate-400 leading-relaxed mt-1.5">
-                  Turns informal creator DMs into a real business pipeline. Prices usage rights, connects you with active sponsors, and manages deliverables in a unified CRM.
-                </p>
-              </div>
-              <ul className="text-xs text-slate-300 space-y-2 pt-4 border-t border-white/[0.06]">
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Sponsor Radar (Targeted Outreach)</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Commercial Deal Rate Calculator</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Sponsorship Kanban CRM Pipeline</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </FadeInWhenVisible>
 
       {/* Linear-Style Old Way vs. Intelligence Comparison */}
       <OldWayComparison />
