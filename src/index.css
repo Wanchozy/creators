@@ -3,16 +3,46 @@
 @tailwind utilities;
 
 :root {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, Helvetica, Arial, sans-serif;
+  letter-spacing: -0.015em;
   color-scheme: dark;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #070a10;
-  color: #f1f5f9;
+  background-color: #07080c;
+  color: #ededed;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hairline Grid & Border System (Linear & Vercel standard) */
+.bg-grid-hairline {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.hairline-b {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hairline-t {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hairline-r {
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hairline-l {
+  border-left: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hairline {
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 /* Custom modern scrollbars */

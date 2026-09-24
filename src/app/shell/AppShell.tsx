@@ -147,6 +147,11 @@ export const AppShell: React.FC<AppShellProps> = ({
     },
   ];
 
+  const currentNavGroup = navGroups.find((g) => g.items.some((i) => i.id === activeTab));
+  const currentNavItem = currentNavGroup?.items.find((i) => i.id === activeTab);
+  const activePillarName = currentNavGroup?.group ? currentNavGroup.group.split(':')[1]?.trim() || currentNavGroup.group : 'Workspace';
+  const activeTabLabel = currentNavItem?.label || 'Overview';
+
   return (
     <div className="min-h-screen bg-[#07090e] text-slate-100 flex flex-col md:flex-row antialiased selection:bg-indigo-500 selection:text-white">
       {/* Mobile Bar */}
@@ -297,13 +302,13 @@ export const AppShell: React.FC<AppShellProps> = ({
       </aside>
 
       {/* Main Workspace Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 bg-[#07090e] relative">
+      <main className="flex-1 flex flex-col min-w-0 bg-[#07090e] relative h-screen overflow-hidden">
         {/* Subtle Ambient Light at Top */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-36 bg-indigo-500/[0.03] blur-3xl pointer-events-none" />
 
         {/* Unauthenticated Sync Banner */}
         {!isAuthenticated && (
-          <div className="bg-[#0e1018] border-b border-amber-500/20 px-4 sm:px-6 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs relative z-10">
+          <div className="bg-[#0e1018] border-b border-amber-500/20 px-4 sm:px-6 py-2 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs relative z-10 shrink-0">
             <div className="flex items-center space-x-2.5 text-slate-300">
               <span className="px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[10px] font-bold uppercase tracking-wider shrink-0">
                 Sandbox Mode
@@ -321,7 +326,39 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
         )}
 
-        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full flex-1 relative z-10">
+        {/* Linear-Style Sticky Top Command Header */}
+        <header className="h-11 shrink-0 px-4 sm:px-6 bg-[#07090e]/95 backdrop-blur-md border-b border-white/[0.06] flex items-center justify-between text-xs relative z-20">
+          {/* Breadcrumb Path */}
+          <div className="flex items-center space-x-2 text-slate-400 font-mono text-[11px]">
+            <span className="text-slate-500 uppercase tracking-wider">{activePillarName}</span>
+            <span className="text-slate-700">/</span>
+            <span className="text-slate-200 font-semibold">{activeTabLabel}</span>
+            <span className="hidden sm:inline-flex items-center space-x-1.5 ml-3 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px]">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>LIVE BENCHMARK</span>
+            </span>
+          </div>
+
+          {/* Quick Action Badges */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setIsCommandPaletteOpen(true)}
+              className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-md bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] text-slate-400 hover:text-slate-200 text-[11px] font-mono transition"
+            >
+              <span>Search commands...</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-white/[0.06] text-[10px] text-slate-300 font-mono">⌘K</kbd>
+            </button>
+            <button
+              onClick={() => handleAddDealFromExternal('New Brand Inbound', 2500)}
+              className="px-2.5 py-1 rounded-md bg-white hover:bg-slate-100 text-slate-950 font-semibold text-[11px] transition shadow-sm flex items-center space-x-1"
+            >
+              <span>+ Deal</span>
+            </button>
+          </div>
+        </header>
+
+        {/* Main View Area with Zero Wasted Space - Full Bleed */}
+        <div className="flex-1 w-full overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10 custom-scrollbar">
           <Suspense fallback={<ViewLoader />}>
             {activeTab === 'overview' && <OverviewDashboard onNavigateTab={setActiveTab} />}
             {activeTab === 'detective' && <AlgorithmDetectiveView />}
@@ -343,6 +380,46 @@ export const AppShell: React.FC<AppShellProps> = ({
             {activeTab === 'deal-crm' && <DealPipelineCRMView />}
           </Suspense>
         </div>
+
+        {/* Linear-Style Bottom Status Bar */}
+        <footer className="h-7 shrink-0 px-4 sm:px-6 bg-[#080a0f] border-t border-white/[0.06] flex items-center justify-between text-[11px] font-mono text-slate-500 relative z-20 select-none">
+          <div className="flex items-center space-x-4">
+            <span className="text-slate-400">Navigation:</span>
+            <button
+              onClick={() => setActiveTab('overview')}
+              className="flex items-center space-x-1 hover:text-slate-300 transition"
+            >
+              <kbd className="px-1 py-0.2 rounded bg-white/[0.06] text-slate-300">G</kbd>
+              <kbd className="px-1 py-0.2 rounded bg-white/[0.06] text-slate-300">O</kbd>
+              <span className="text-slate-500">Overview</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('deal-crm')}
+              className="hidden sm:flex items-center space-x-1 hover:text-slate-300 transition"
+            >
+              <kbd className="px-1 py-0.2 rounded bg-white/[0.06] text-slate-300">G</kbd>
+              <kbd className="px-1 py-0.2 rounded bg-white/[0.06] text-slate-300">D</kbd>
+              <span className="text-slate-500">Deals</span>
+            </button>
+            <button
+              onClick={() => setIsCommandPaletteOpen(true)}
+              className="hidden md:flex items-center space-x-1 hover:text-slate-300 transition"
+            >
+              <kbd className="px-1 py-0.2 rounded bg-white/[0.06] text-slate-300">⌘K</kbd>
+              <span className="text-slate-500">Palette</span>
+            </button>
+          </div>
+          <div className="flex items-center space-x-3 text-slate-400">
+            <span className="inline-flex items-center space-x-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>RLS Active</span>
+            </span>
+            <span>•</span>
+            <span className="hidden sm:inline">14ms Edge Latency</span>
+            <span>•</span>
+            <span>Creator's v2.0</span>
+          </div>
+        </footer>
       </main>
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />

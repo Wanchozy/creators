@@ -123,7 +123,7 @@ export const SponsorRadarView: React.FC<SponsorRadarViewProps> = ({ onPitchCreat
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 w-full">
       {/* Header */}
       <div className="pb-5 border-b border-white/[0.08]">
         <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-400 mb-1">

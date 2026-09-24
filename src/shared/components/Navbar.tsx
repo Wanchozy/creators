@@ -32,21 +32,22 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-50 glass-panel border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <header className="sticky top-0 z-50 hairline-b bg-[#08090d]/90 backdrop-blur-md">
+        <div className="w-full px-4 sm:px-6 h-13 flex items-center justify-between">
           {/* Brand Logo */}
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setCurrentView('marketing')}>
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-500 to-purple-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
-              <Sparkles className="w-5 h-5 text-white" />
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-brand-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-sm">
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="text-xl font-extrabold tracking-tight text-white font-sans">Creator's</span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30">
-                  Intelligence
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 -mt-0.5 hidden sm:block">Content & Business Operating System</p>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-bold tracking-tight text-white font-sans">Creator's</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-white/[0.04] text-slate-400 border border-white/[0.06]">
+                OS v2.0
+              </span>
+              <span className="hidden md:flex items-center space-x-1.5 text-[11px] font-mono text-emerald-400 pl-2 border-l border-white/[0.08]">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Live Intelligence</span>
+              </span>
             </div>
           </div>
 
