@@ -573,58 +573,61 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
           </div>
 
           {/* Pro Creator with BorderBeam */}
-          <div className="rounded-2xl border-2 border-indigo-500/70 bg-[#0c0e14] p-7 flex flex-col justify-between relative shadow-[0_0_40px_rgba(99,102,241,0.15)] overflow-hidden">
-            <BorderBeam duration={7} borderWidth={2} colorFrom="#6366f1" colorTo="#a855f7" />
-
-            <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-indigo-500 text-[10px] font-mono font-bold text-white uppercase tracking-wider z-20 shadow-md">
+          <div className="relative flex flex-col">
+            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-[10px] font-mono font-bold text-white uppercase tracking-wider z-20 shadow-[0_2px_12px_rgba(99,102,241,0.5)] border border-white/20 whitespace-nowrap">
               Most Popular for Creators
             </div>
-            <div>
-              <div className="text-[11px] font-mono font-bold text-indigo-400 uppercase tracking-wider">Pro Creator</div>
-              <div className="text-3xl font-extrabold text-white mt-2 font-mono flex items-baseline space-x-1">
-                <RollingNumber value={billingCycle === 'annual' ? 22 : 29} prefix="$" />
-                <span className="text-xs text-slate-400 font-sans font-normal">/ month</span>
+
+            <div className="rounded-2xl border-2 border-indigo-500/70 bg-[#0c0e14] p-7 flex flex-col justify-between relative shadow-[0_0_40px_rgba(99,102,241,0.15)] overflow-hidden flex-1">
+              <BorderBeam duration={7} borderWidth={2} colorFrom="#6366f1" colorTo="#a855f7" />
+
+              <div>
+                <div className="text-[11px] font-mono font-bold text-indigo-400 uppercase tracking-wider">Pro Creator</div>
+                <div className="text-3xl font-extrabold text-white mt-2 font-mono flex items-baseline space-x-1">
+                  <RollingNumber value={billingCycle === 'annual' ? 22 : 29} prefix="$" />
+                  <span className="text-xs text-slate-400 font-sans font-normal">/ month</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-2">
+                  {billingCycle === 'annual'
+                    ? 'Billed $264 annually. Save 25% + 2 months free.'
+                    : 'Billed monthly. Cancel anytime.'}
+                </p>
+
+                <ul className="mt-6 space-y-2.5 text-xs text-slate-200">
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Unlimited Video Diagnoses & Autopsies</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Creator Scientist Pattern Discovery</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Pre-Upload Monetization Risk Scanner</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Sponsor Radar with Verified Brand Contacts</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Originality & AI Scraper Alerts</span>
+                  </li>
+                  <li className="flex items-center space-x-2">
+                    <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Full CRM & Invoice Exporter</span>
+                  </li>
+                </ul>
               </div>
-              <p className="text-xs text-slate-400 mt-2">
-                {billingCycle === 'annual'
-                  ? 'Billed $264 annually. Save 25% + 2 months free.'
-                  : 'Billed monthly. Cancel anytime.'}
-              </p>
 
-              <ul className="mt-6 space-y-2.5 text-xs text-slate-200">
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Unlimited Video Diagnoses & Autopsies</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Creator Scientist Pattern Discovery</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Pre-Upload Monetization Risk Scanner</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Sponsor Radar with Verified Brand Contacts</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Originality & AI Scraper Alerts</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Full CRM & Invoice Exporter</span>
-                </li>
-              </ul>
+              <button
+                onClick={onLaunchApp}
+                className="mt-8 w-full py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 text-xs font-bold shadow-[0_0_20px_rgba(255,255,255,0.2)] transition transform hover:-translate-y-0.5 z-20"
+              >
+                Launch Pro Workspace
+              </button>
             </div>
-
-            <button
-              onClick={onLaunchApp}
-              className="mt-8 w-full py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-950 text-xs font-bold shadow-[0_0_20px_rgba(255,255,255,0.2)] transition transform hover:-translate-y-0.5 z-20"
-            >
-              Launch Pro Workspace
-            </button>
           </div>
 
           {/* Agency & Manager */}
