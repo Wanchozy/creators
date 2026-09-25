@@ -1,115 +1,17 @@
 import React from 'react';
-import { Sparkles, Shield, Heart, Terminal, Compass, TrendingUp, Layers } from 'lucide-react';
+import { ArrowUpRight, Layers3, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react';
 
-export const Footer: React.FC<{ onNavigateToAppTab?: (tab: string) => void }> = ({ onNavigateToAppTab }) => {
-  return (
-    <footer className="border-t border-slate-800/80 bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 text-slate-400">
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Brand statement */}
-        <div className="md:col-span-1 space-y-4">
-          <div className="flex items-center space-x-2">
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-lg font-extrabold text-white">Creator's</span>
-          </div>
-          <p className="text-xs leading-relaxed text-slate-400">
-            Instead of another AI that spits out generic content, Creator's builds the software that helps creators understand the business and real performance of their content.
-          </p>
-          <div className="text-[11px] text-slate-400">
-            Ground truth analytics for YouTube, TikTok & Instagram.
-          </div>
-        </div>
-
-        {/* Content Intelligence Pillar */}
-        <div>
-          <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-brand-400" />
-            <span>Content Intelligence</span>
-          </h4>
-          <ul className="space-y-2 text-xs">
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('detective')} className="hover:text-brand-300 transition">
-                Algorithm Detective ("Why Did My Video Die?")
-              </button>
-            </li>
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('scientist')} className="hover:text-brand-300 transition">
-                Creator Scientist (Pattern Mining)
-              </button>
-            </li>
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('originality')} className="hover:text-brand-300 transition">
-                Originality & AI Copycat Monitor
-              </button>
-            </li>
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('recycler')} className="hover:text-brand-300 transition">
-                Smart Recycler (Repurposing Studio)
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        {/* Monetization & Protection */}
-        <div>
-          <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
-            <Shield className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Monetization & Safety</span>
-          </h4>
-          <ul className="space-y-2 text-xs">
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('risk-scanner')} className="hover:text-emerald-300 transition">
-                Pre-Publish Monetization Risk Checker
-              </button>
-            </li>
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('platform-changes')} className="hover:text-emerald-300 transition">
-                Platform Changes & Policy Tracker
-              </button>
-            </li>
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('revenue-analytics')} className="hover:text-emerald-300 transition">
-                Qualified Views & RPM Demystifier
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        {/* Business & Deals */}
-        <div>
-          <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider mb-3 flex items-center space-x-1.5">
-            <Layers className="w-3.5 h-3.5 text-amber-400" />
-            <span>Deal Infrastructure</span>
-          </h4>
-          <ul className="space-y-2 text-xs">
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('sponsor-radar')} className="hover:text-amber-300 transition">
-                Sponsor Radar (Brand Discovery)
-              </button>
-            </li>
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('rate-calculator')} className="hover:text-amber-300 transition">
-                Creator Rate & Licensing Calculator
-              </button>
-            </li>
-            <li>
-              <button onClick={() => onNavigateToAppTab?.('deal-crm')} className="hover:text-amber-300 transition">
-                Sponsorship Pipeline & CRM
-              </button>
-            </li>
-          </ul>
-        </div>
+export const Footer: React.FC<{ onNavigateToAppTab?: (tab: string) => void }> = ({ onNavigateToAppTab }) => <footer className="site-footer px-5 pb-7 pt-12 sm:px-8 lg:px-12">
+  <div className="mx-auto max-w-[1320px]">
+    <div className="grid gap-9 border-b border-white/[.09] pb-10 sm:grid-cols-2 lg:grid-cols-[1.35fr_1fr_1fr_1fr]">
+      <div className="max-w-[300px]">
+        <a href="#" className="flex items-center gap-2.5"><span className="brand-mark flex h-9 w-9 items-center justify-center rounded-xl"><Sparkles className="h-[17px] w-[17px]" /></span><span className="text-[15px] font-bold tracking-[-.04em] text-[#f1f1e8]">Creator’s</span></a>
+        <p className="mt-4 text-xs leading-6 text-[#92978d]">A clearer view of your content, partnerships and the business you’re building around them.</p>
       </div>
-
-      <div className="max-w-7xl mx-auto mt-10 pt-6 border-t border-slate-800/60 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
-        <div>© {new Date().getFullYear()} Creator's Platform Inc. Built for human creators.</div>
-        <div className="flex items-center space-x-4 mt-2 sm:mt-0">
-          <span>Policy compliant with 2025/2026 YouTube & TikTok Terms</span>
-          <span>•</span>
-          <span>Privacy & API Data Encrypted</span>
-        </div>
-      </div>
-    </footer>
-  );
-};
+      <div><h3 className="footer-heading"><TrendingUp className="h-3.5 w-3.5 text-[#c8e88e]" /> Content intelligence</h3><ul className="footer-list"><li><button onClick={() => onNavigateToAppTab?.('detective')}>Algorithm Detective</button></li><li><button onClick={() => onNavigateToAppTab?.('scientist')}>Creator Scientist</button></li><li><button onClick={() => onNavigateToAppTab?.('originality')}>Originality Monitor</button></li><li><button onClick={() => onNavigateToAppTab?.('recycler')}>Smart Recycler</button></li></ul></div>
+      <div><h3 className="footer-heading"><ShieldCheck className="h-3.5 w-3.5 text-[#c8e88e]" /> Revenue & protection</h3><ul className="footer-list"><li><button onClick={() => onNavigateToAppTab?.('risk-scanner')}>Monetization Scanner</button></li><li><button onClick={() => onNavigateToAppTab?.('revenue-analytics')}>Qualified Revenue</button></li><li><button onClick={() => onNavigateToAppTab?.('platform-changes')}>Platform Changes</button></li></ul></div>
+      <div><h3 className="footer-heading"><Layers3 className="h-3.5 w-3.5 text-[#c8e88e]" /> Partnerships</h3><ul className="footer-list"><li><button onClick={() => onNavigateToAppTab?.('sponsor-radar')}>Sponsor Radar</button></li><li><button onClick={() => onNavigateToAppTab?.('rate-calculator')}>Rate Calculator</button></li><li><button onClick={() => onNavigateToAppTab?.('deal-crm')}>Deal Pipeline</button></li></ul></div>
+    </div>
+    <div className="flex flex-col gap-3 pt-5 text-[10px] text-[#737970] sm:flex-row sm:items-center sm:justify-between"><span>© {new Date().getFullYear()} Creator’s. Built for the people behind the posts.</span><div className="flex items-center gap-4"><a href="#faq" className="footer-bottom-link">Privacy & data <ArrowUpRight className="h-3 w-3" /></a><span>Independent by design</span></div></div>
+  </div>
+</footer>;
