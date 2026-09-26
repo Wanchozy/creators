@@ -45,6 +45,22 @@ export function App() {
 
   const [currentView, setCurrentView] = useState<'marketing' | 'app' | 'onboarding'>('marketing');
   const [activeAppTab, setActiveAppTab] = useState<string>('overview');
+  const [marketingTheme, setMarketingTheme] = useState<'dark' | 'light'>(() => {
+    try {
+      return window.localStorage.getItem('creators-marketing-theme') === 'light' ? 'light' : 'dark';
+    } catch {
+      return 'dark';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('creators-marketing-theme', marketingTheme);
+    } catch {
+      // Keep the in-memory preference when browser storage is unavailable.
+    }
+    document.documentElement.style.colorScheme = currentView === 'marketing' ? marketingTheme : 'dark';
+  }, [marketingTheme, currentView]);
 
   // Check once on mount if this is a public /m/:handle URL
   const [publicHandle] = useState<string | null>(() => detectPublicMediaKitHandle());
@@ -111,7 +127,7 @@ export function App() {
   // --- Main Application ---
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-white relative">
+      <div data-site-theme={currentView === 'marketing' ? marketingTheme : undefined} className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-white relative">
         <ScrollProgress />
         <TechBackground />
         <CursorSpotlight />
@@ -121,6 +137,8 @@ export function App() {
           <Navbar
             currentView={currentView}
             setCurrentView={setCurrentView}
+            marketingTheme={marketingTheme}
+            onToggleMarketingTheme={() => setMarketingTheme((theme) => theme === 'dark' ? 'light' : 'dark')}
             activeAppTab={activeAppTab}
             setActiveAppTab={handleNavigateToModule}
             onLaunchOnboarding={() => {
