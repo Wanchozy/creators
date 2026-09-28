@@ -1,51 +1,29 @@
 import React, { useState } from 'react';
-import { motion, useMotionValueEvent, useTransform, type MotionValue } from 'framer-motion';
 import { ArrowUpRight, Bell, ChevronDown, Globe2, LayoutDashboard, LogIn, Menu, Moon, Settings, Sparkles, Sun, X } from 'lucide-react';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useProfile } from '@/shared/hooks/useProfile';
 import { AuthModal } from './AuthModal';
 import { ChannelSettingsModal } from './ChannelSettingsModal';
-import { JOURNEY_STAGES, type JourneyStage } from './motion/journeyStage';
-
-const clamp = (val: number, min: number, max: number) => Math.min(max, Math.max(min, val));
-const stageAt = (position: number): JourneyStage => JOURNEY_STAGES[clamp(Math.round(position + 0.1), 0, JOURNEY_STAGES.length - 1)];
 
 interface NavbarProps {
   currentView: 'marketing' | 'app' | 'onboarding';
   setCurrentView: (view: 'marketing' | 'app' | 'onboarding') => void;
   marketingTheme: 'dark' | 'light';
-  journeyStage?: JourneyStage;
-  journeyProgress: MotionValue<number>;
   onToggleMarketingTheme: () => void;
   activeAppTab?: string;
   setActiveAppTab?: (tab: string) => void;
   onLaunchOnboarding?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = React.memo(({ currentView, setCurrentView, marketingTheme, journeyStage = 'core', journeyProgress, onToggleMarketingTheme, activeAppTab, setActiveAppTab, onLaunchOnboarding }) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView, marketingTheme, onToggleMarketingTheme, activeAppTab, setActiveAppTab, onLaunchOnboarding }) => {
   const { user } = useAuth();
   const { profile } = useProfile();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [stage, setStage] = useState<JourneyStage>(journeyStage);
-
-  useMotionValueEvent(journeyProgress, 'change', (position) => {
-    const nextStage = stageAt(position);
-    setStage((prev) => (prev === nextStage ? prev : nextStage));
-  });
-
   const isAuthenticated = Boolean(user && !user.isDemo);
   const channelDisplayName = profile?.channelName || user?.channelName || user?.displayName || 'Creator Studio';
   const initials = channelDisplayName.substring(0, 2).toUpperCase();
-  const journeyLabels: Record<JourneyStage, string> = {
-    core: 'The signal', analytics: 'Understanding', protection: 'Protection',
-    partnerships: 'Opportunity', revenue: 'Revenue', convergence: 'One intelligence system',
-  };
-  const stageProgress: Record<JourneyStage, number> = {
-    core: 8, analytics: 28, protection: 47, partnerships: 64, revenue: 81, convergence: 100,
-  };
-  const progressFill = useTransform(journeyProgress, [0, 5], [0, 1]);
 
   const navigate = (view: 'marketing' | 'app') => {
     setCurrentView(view);
@@ -66,11 +44,6 @@ export const Navbar: React.FC<NavbarProps> = React.memo(({ currentView, setCurre
         </nav> : <div className="view-switcher" aria-label="View switcher">
           <button onClick={() => navigate('marketing')} className="view-switch"><Globe2 size={14} /> Website</button>
           <button onClick={() => navigate('app')} className={`view-switch ${currentView === 'app' ? 'view-switch-active' : ''}`}><LayoutDashboard size={14} /> Workspace</button>
-        </div>}
-
-        {currentView === 'marketing' && <div className="journey-indicator" data-stage={stage} role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={stageProgress[stage]} aria-valuetext={`Journey: ${journeyLabels[stage]}`}>
-          <span className="journey-indicator-top"><i /><span><small>NOW MOVING THROUGH</small><b>{journeyLabels[stage]}</b></span></span>
-          <span className="journey-indicator-track"><motion.i style={{ scaleX: progressFill, transformOrigin: '0% 50%' }} /></span>
         </div>}
 
         <div className="nav-actions">
@@ -94,6 +67,6 @@ export const Navbar: React.FC<NavbarProps> = React.memo(({ currentView, setCurre
     <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onAuthSuccess={() => { if (!profile?.onboardingCompleted) setCurrentView('onboarding'); else setCurrentView('app'); }} />
     <ChannelSettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} onLaunchOnboarding={() => { if (onLaunchOnboarding) onLaunchOnboarding(); else setCurrentView('onboarding'); }} />
   </>;
-});
+};
 
 const ArrowRightIcon = () => <ArrowUpRight size={14} />;

@@ -5,7 +5,6 @@ import { ToastProvider } from '@/shared/components/Toast';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useProfile } from '@/shared/hooks/useProfile';
 import { ScrollProgress, CursorSpotlight, TechBackground } from '@/shared/components/motion';
-import { JourneyAtmosphere, useJourneyProgress } from '@/shared/components/motion/JourneyAtmosphere';
 
 // Lazy-loaded heavy views — each becomes its own chunk
 const LandingPage = lazy(() =>
@@ -53,7 +52,6 @@ export function App() {
       return 'dark';
     }
   });
-  const journeyProgress = useJourneyProgress(currentView === 'marketing');
 
   useEffect(() => {
     try {
@@ -62,9 +60,6 @@ export function App() {
       // Keep the in-memory preference when browser storage is unavailable.
     }
     document.documentElement.style.colorScheme = currentView === 'marketing' ? marketingTheme : 'dark';
-    document.body.style.backgroundColor = currentView === 'marketing'
-      ? (marketingTheme === 'dark' ? '#090a11' : '#f5f3ec')
-      : '#07090e';
   }, [marketingTheme, currentView]);
 
   // Check once on mount if this is a public /m/:handle URL
@@ -132,20 +127,17 @@ export function App() {
   // --- Main Application ---
   return (
     <ToastProvider>
-      <div data-site-theme={currentView === 'marketing' ? marketingTheme : undefined} className={`min-h-screen flex flex-col selection:bg-brand-500 selection:text-white relative ${currentView === 'marketing' ? 'marketing-root' : 'bg-slate-950 text-slate-100'}`}>
+      <div data-site-theme={currentView === 'marketing' ? marketingTheme : undefined} className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-white relative">
         <ScrollProgress />
-        <JourneyAtmosphere active={currentView === 'marketing'} enabled={marketingTheme === 'dark'} progress={journeyProgress} />
-        {currentView !== 'marketing' && <TechBackground />}
+        <TechBackground />
         <CursorSpotlight />
 
-        <div className={`flex-1 flex flex-col relative z-10 ${currentView === 'marketing' ? 'marketing-content' : ''}`}>
         {/* Only show global Navbar on Marketing and Workspace views. Onboarding has its own focused header. */}
         {currentView !== 'onboarding' && (
           <Navbar
             currentView={currentView}
             setCurrentView={setCurrentView}
             marketingTheme={marketingTheme}
-            journeyProgress={journeyProgress}
             onToggleMarketingTheme={() => setMarketingTheme((theme) => theme === 'dark' ? 'light' : 'dark')}
             activeAppTab={activeAppTab}
             setActiveAppTab={handleNavigateToModule}
@@ -171,7 +163,6 @@ export function App() {
                 <LandingPage
                   onLaunchApp={handleLaunchApp}
                   onNavigateToModule={handleNavigateToModule}
-                  journeyProgress={journeyProgress}
                 />
                 <Footer onNavigateToAppTab={handleNavigateToModule} />
               </>
@@ -190,7 +181,6 @@ export function App() {
               />
             )}
           </Suspense>
-        </div>
         </div>
       </div>
     </ToastProvider>
