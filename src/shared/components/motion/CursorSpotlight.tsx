@@ -10,15 +10,25 @@ export const CursorSpotlight: React.FC = () => {
     let currentX = targetX;
     let currentY = targetY;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      targetX = e.clientX;
-      targetY = e.clientY;
-    };
+    let isRunning = false;
 
     const updatePosition = () => {
-      // Smooth lerp (linear interpolation) for organic trailing effect
-      currentX += (targetX - currentX) * 0.12;
-      currentY += (targetY - currentY) * 0.12;
+      const dx = targetX - currentX;
+      const dy = targetY - currentY;
+
+      if (Math.abs(dx) < 0.2 && Math.abs(dy) < 0.2) {
+        currentX = targetX;
+        currentY = targetY;
+        if (containerRef.current) {
+          containerRef.current.style.setProperty('--spotlight-x', `${currentX}px`);
+          containerRef.current.style.setProperty('--spotlight-y', `${currentY}px`);
+        }
+        isRunning = false;
+        return;
+      }
+
+      currentX += dx * 0.14;
+      currentY += dy * 0.14;
 
       if (containerRef.current) {
         containerRef.current.style.setProperty('--spotlight-x', `${currentX}px`);
@@ -28,8 +38,21 @@ export const CursorSpotlight: React.FC = () => {
       animationFrameId = requestAnimationFrame(updatePosition);
     };
 
+    const startLoop = () => {
+      if (!isRunning) {
+        isRunning = true;
+        animationFrameId = requestAnimationFrame(updatePosition);
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      startLoop();
+    };
+
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    animationFrameId = requestAnimationFrame(updatePosition);
+    startLoop();
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);

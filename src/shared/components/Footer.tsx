@@ -1,7 +1,7 @@
 import React from 'react';
 import { ArrowUpRight, Layers3, ShieldCheck, Sparkles, TrendingUp } from 'lucide-react';
 
-export const Footer: React.FC<{ onNavigateToAppTab?: (tab: string) => void }> = ({ onNavigateToAppTab }) => <footer className="site-footer">
+export const Footer: React.FC<{ onNavigateToAppTab?: (tab: string) => void }> = ({ onNavigateToAppTab }) => <footer data-journey-phase="convergence" className="site-footer">
   <div className="footer-shell">
     <div className="footer-main">
       <div className="footer-brand">
