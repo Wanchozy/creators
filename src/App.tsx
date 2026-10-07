@@ -1,3 +1,23 @@
+/**
+ * ==============================================================================
+ * STEP 3: THE TRAFFIC DIRECTOR (src/App.tsx)
+ * ==============================================================================
+ * Think of App.tsx as the main train station or concierge of our website.
+ * It does not draw every button itself; instead, it checks:
+ * 
+ * 1. "Who is visiting?" (A brand viewing /m/:handle? A new user? An existing creator?)
+ * 2. "Which screen should we show?"
+ *    - Marketing Site: LandingPage.tsx (for visitors)
+ *    - Public Media Kit: PublicMediaKitPage.tsx (for brands looking at a creator)
+ *    - Onboarding: OnboardingFlow.tsx (first-time creator setup wizard)
+ *    - App Workspace: AppShell.tsx (the private dashboard with 11 creator tools)
+ * 
+ * Performance Tip: We use `lazy(...)` to load heavy pages only when needed.
+ * That way, visitors don't have to download the entire dashboard code unless
+ * they actually click to open it!
+ * ==============================================================================
+ */
+
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Navbar } from '@/shared/components/Navbar';
 import { Footer } from '@/shared/components/Footer';
@@ -6,7 +26,7 @@ import { useAuth } from '@/shared/hooks/useAuth';
 import { useProfile } from '@/shared/hooks/useProfile';
 import { ScrollProgress, CursorSpotlight, TechBackground } from '@/shared/components/motion';
 
-// Lazy-loaded heavy views — each becomes its own chunk
+// Code-splitting: Each of these heavy views is bundled into its own smaller file.
 const LandingPage = lazy(() =>
   import('@/website/pages/LandingPage').then((m) => ({ default: m.LandingPage }))
 );
@@ -43,6 +63,11 @@ export function App() {
   const { user } = useAuth();
   const { profile, refresh: refreshProfile } = useProfile();
 
+  // ============================================================================
+  // APP STATE (Short-Term Memory)
+  // React uses "useState" to remember things like which tab or view is active.
+  // When these values change, React automatically re-draws the screen!
+  // ============================================================================
   const [currentView, setCurrentView] = useState<'marketing' | 'app' | 'onboarding'>('marketing');
   const [activeAppTab, setActiveAppTab] = useState<string>('overview');
   const [marketingTheme, setMarketingTheme] = useState<'dark' | 'light'>(() => {
@@ -114,8 +139,8 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // --- Public Media Kit Route ---
-  // If URL matches /m/:handle, render only the public one-sheet viewer (no chrome)
+  // --- ROUTE 1: PUBLIC MEDIA KIT ROUTE ---
+  // If the browser URL is /m/:handle, we render the public one-sheet viewer directly.
   if (publicHandle) {
     return (
       <Suspense fallback={<PageLoader />}>
@@ -124,7 +149,7 @@ export function App() {
     );
   }
 
-  // --- Main Application ---
+  // --- ROUTE 2, 3 & 4: MAIN APPLICATION SURFACE ---
   return (
     <ToastProvider>
       <div data-site-theme={currentView === 'marketing' ? marketingTheme : undefined} className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-brand-500 selection:text-white relative">
@@ -132,7 +157,7 @@ export function App() {
         <TechBackground />
         <CursorSpotlight />
 
-        {/* Only show global Navbar on Marketing and Workspace views. Onboarding has its own focused header. */}
+        {/* Global Navbar: shown on marketing & workspace views (onboarding has its own step header) */}
         {currentView !== 'onboarding' && (
           <Navbar
             currentView={currentView}
@@ -150,6 +175,7 @@ export function App() {
 
         <div className="flex-1 flex flex-col">
           <Suspense fallback={<PageLoader />}>
+            {/* VIEW BRANCH A: Onboarding Wizard for new creators */}
             {currentView === 'onboarding' ? (
               <OnboardingFlow
                 onComplete={handleOnboardingComplete}
@@ -159,6 +185,7 @@ export function App() {
                 }}
               />
             ) : currentView === 'marketing' ? (
+              /* VIEW BRANCH B: Public Marketing Landing Page & Footer */
               <>
                 <LandingPage
                   onLaunchApp={handleLaunchApp}
@@ -167,6 +194,7 @@ export function App() {
                 <Footer onNavigateToAppTab={handleNavigateToModule} />
               </>
             ) : (
+              /* VIEW BRANCH C: Private Creator Workspace Dashboard */
               <AppShell
                 activeTab={activeAppTab}
                 setActiveTab={setActiveAppTab}

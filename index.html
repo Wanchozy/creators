@@ -12,7 +12,15 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
   <body class="antialiased min-h-screen">
+    <!-- 
+      THE FRONT DOOR OF THE APPLICATION:
+      This single empty <div> with id="root" is where React injects the entire website!
+      When the browser reads the <script> below, it runs /src/main.tsx which renders
+      our entire app inside this container.
+    -->
     <div id="root"></div>
+
+    <!-- The spark plug: loads the React TypeScript code -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
