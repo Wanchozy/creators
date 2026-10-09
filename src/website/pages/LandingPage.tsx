@@ -27,6 +27,7 @@ import { InteractiveRateTeaser } from '../components/InteractiveRateTeaser';
 import { InteractiveDiagnosisTeaser } from '../components/InteractiveDiagnosisTeaser';
 import { InteractiveMediaKitTeaser } from '../components/InteractiveMediaKitTeaser';
 import { ScrollStory } from '../components/ScrollStory';
+import { AppleParallaxHero } from '../components/AppleParallaxHero';
 
 interface LandingPageProps {
   onLaunchApp: () => void;
@@ -62,89 +63,23 @@ const categoryOptions = [
 
 type Category = (typeof categoryOptions)[number]['id'];
 type StoryStage = 'diagnosis' | 'pricing' | 'media-kit';
-type SignalMode = 'audience' | 'partnerships' | 'protection';
-
-const signals: Record<SignalMode, { label: string; title: string; metric: string; metricLabel: string; note: string; icon: typeof Activity; accent: string }> = {
-  audience: { label: 'Audience', title: 'A pattern worth repeating.', metric: '+18%', metricLabel: 'watch time vs. baseline', note: 'A faster first beat is holding attention longer in this sample.', icon: Activity, accent: 'violet' },
-  partnerships: { label: 'Partnerships', title: 'Every right has a value.', metric: '$3.4k', metricLabel: 'illustrative deal value', note: 'Separate production, paid usage and exclusivity before you quote.', icon: BriefcaseBusiness, accent: 'lime' },
-  protection: { label: 'Protection', title: 'Check before you publish.', metric: '4 checks', metricLabel: 'in a sample pre-flight', note: 'Review originality, policy changes and potential monetization risks.', icon: ShieldCheck, accent: 'coral' },
-};
-
-const reveal = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55 } },
-};
-
-function SignalConstellation({ active, onChange }: { active: SignalMode; onChange: (mode: SignalMode) => void }) {
-  const activeSignal = signals[active];
-  const ActiveIcon = activeSignal.icon;
-  const prefersReducedMotion = useReducedMotion();
-  return (
-    <div className={`signal-constellation mode-${active}`}>
-      <div className="signal-windowbar">
-        <div className="window-dots" aria-hidden="true"><i /><i /><i /></div>
-        <span>CREATOR SIGNAL FIELD <span className="window-sep">/</span> SAMPLE 001</span>
-        <span className="window-live"><i /> LIVE PREVIEW</span>
-      </div>
-      <div className="signal-stage">
-        <svg className="signal-svg" viewBox="0 0 560 420" role="img" aria-label="Animated orbit connecting creator audience, partnership and content signals">
-          <defs>
-            <linearGradient id="orbit-stroke" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stopColor="#917aff" /><stop offset="50%" stopColor="#d9ff68" /><stop offset="100%" stopColor="#ff786b" /></linearGradient>
-            <radialGradient id="signal-halo"><stop offset="0%" stopColor="#7f67ff" stopOpacity=".24" /><stop offset="100%" stopColor="#7f67ff" stopOpacity="0" /></radialGradient>
-          </defs>
-          <circle cx="280" cy="208" r="178" fill="url(#signal-halo)" />
-          <motion.ellipse cx="280" cy="208" rx="212" ry="104" fill="none" stroke="url(#orbit-stroke)" strokeWidth="1.2" strokeOpacity=".55" transform="rotate(-23 280 208)" animate={prefersReducedMotion ? undefined : { rotate: 337 }} transition={prefersReducedMotion ? undefined : { duration: 62, repeat: Infinity, ease: 'linear' }} />
-          <motion.ellipse cx="280" cy="208" rx="157" ry="73" fill="none" stroke="#dcd5ff" strokeWidth="1" strokeOpacity=".32" transform="rotate(31 280 208)" animate={prefersReducedMotion ? undefined : { rotate: -329 }} transition={prefersReducedMotion ? undefined : { duration: 78, repeat: Infinity, ease: 'linear' }} />
-          <motion.path d="M84 219 C133 219 138 114 195 116 C242 118 233 293 294 291 C349 289 342 171 398 170 C450 169 448 235 492 235" fill="none" stroke="#d9ff68" strokeWidth="1.5" strokeOpacity=".7" strokeDasharray="3 7" animate={prefersReducedMotion ? undefined : { strokeDashoffset: [0, -40] }} transition={prefersReducedMotion ? undefined : { duration: 4, repeat: Infinity, ease: 'linear' }} />
-          <circle cx="115" cy="207" r="4" fill="#d9ff68" /><circle cx="434" cy="174" r="4" fill="#ff786b" /><circle cx="320" cy="287" r="3" fill="#a291ff" />
-          <circle cx="280" cy="208" r="66" fill="none" stroke="#fff" strokeOpacity=".12" strokeDasharray="2 8" />
-        </svg>
-        <div className="signal-core"><span className="signal-core-spark"><Sparkles size={17} /></span><span className="signal-core-mark">C<span>°</span></span><span className="signal-core-label">YOUR WORK</span></div>
-        <button className={`signal-node node-a ${active === 'audience' ? 'signal-node-active' : ''}`} onClick={() => onChange('audience')} aria-label="Show audience signals"><span className="node-icon"><Activity size={15} /></span><span className="node-copy"><b>Audience</b><small>attention patterns</small></span><span className="node-pin pin-violet" /></button>
-        <button className={`signal-node node-b ${active === 'partnerships' ? 'signal-node-active' : ''}`} onClick={() => onChange('partnerships')} aria-label="Show partnership signals"><span className="node-icon"><BriefcaseBusiness size={15} /></span><span className="node-copy"><b>Partnerships</b><small>rights + rates</small></span><span className="node-pin pin-lime" /></button>
-        <button className={`signal-node node-c ${active === 'protection' ? 'signal-node-active' : ''}`} onClick={() => onChange('protection')} aria-label="Show creator protection signals"><span className="node-icon"><ShieldCheck size={15} /></span><span className="node-copy"><b>Protection</b><small>before publish</small></span><span className="node-pin pin-coral" /></button>
-        <motion.div key={active} className="signal-insight" initial={prefersReducedMotion ? false : { opacity: 0, y: 9 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: prefersReducedMotion ? 0 : 0.24 }}>
-          <div className="insight-top"><span><ActiveIcon size={13} /> SAMPLE SIGNAL</span><span>0{active === 'audience' ? 1 : active === 'partnerships' ? 2 : 3} / 03</span></div>
-          <b>{activeSignal.title}</b><p>{activeSignal.note}</p>
-          <div className="insight-bottom"><span>{activeSignal.metricLabel}</span><strong>{activeSignal.metric}</strong></div>
-        </motion.div>
-      </div>
-      <div className="signal-footer"><span>ONE CREATOR. MANY MOVING PARTS.</span><span><LockKeyhole size={12} /> YOUR DATA STAYS YOURS</span></div>
-    </div>
-  );
-}
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigateToModule }) => {
   const [category, setCategory] = useState<Category>('all');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const [activeStory, setActiveStory] = useState<StoryStage>('diagnosis');
-  const [activeSignal, setActiveSignal] = useState<SignalMode>('audience');
   const prefersReducedMotion = useReducedMotion();
   const revealProps = (delay = 0) => prefersReducedMotion ? {} : { initial: { opacity: 0, y: 18 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, amount: .12 }, transition: { duration: .5, delay, ease: 'easeOut' as const } };
   const visibleSolutions = category === 'all' ? solutions : solutions.filter((item) => item.category === category);
 
   return (
-    <main className="landing-page">
-      <section className="motion-hero" id="top">
-        <div className="hero-grain" aria-hidden="true" />
-        <div className="hero-shell">
-          <motion.div className="hero-copy" initial={prefersReducedMotion ? false : 'hidden'} animate="visible" variants={{ visible: { transition: { staggerChildren: prefersReducedMotion ? 0 : 0.09 } } }}>
-            <motion.div variants={reveal} className="hero-kicker"><span className="kicker-star"><Sparkles size={13} /></span> THE CREATOR BUSINESS, IN MOTION</motion.div>
-            <motion.h1 variants={reveal}>Make the work.<br /><em>Read the signal.</em></motion.h1>
-            <motion.p variants={reveal} className="hero-lede">Your content moves. Your audience responds. Your business grows in the spaces between. Creator’s helps you see what’s connected—and what to do next.</motion.p>
-            <motion.div variants={reveal} className="hero-actions">
-              <button onClick={onLaunchApp} className="hero-button hero-button-primary">Explore your workspace <ArrowRight size={16} /></button>
-              <a href="#experiments" className="hero-button hero-button-quiet">Play with the signals <ArrowDownRight size={16} /></a>
-            </motion.div>
-            <motion.div variants={reveal} className="hero-proof"><span><LockKeyhole size={14} /> Read-only by design</span><i /><span>Made for YouTube, TikTok & Instagram</span></motion.div>
-          </motion.div>
-          <motion.div className="hero-art" initial={prefersReducedMotion ? false : { opacity: 0, scale: .96, rotate: -1 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} transition={{ duration: prefersReducedMotion ? 0 : .7, delay: prefersReducedMotion ? 0 : .18 }}>
-            <SignalConstellation active={activeSignal} onChange={setActiveSignal} />
-          </motion.div>
-        </div>
-        <div className="hero-bottomline"><span>LESS GUESSING. MORE GOOD DECISIONS.</span><a href="#platform">Scroll to explore <ArrowDownRight size={13} /></a><span className="scroll-ruler"><i /></span></div>
-      </section>
+    <main className="landing-page bg-[#050608]">
+      {/* 3D Apple-grade Multi-speed Parallax Hero */}
+      <AppleParallaxHero
+        onLaunchApp={onLaunchApp}
+        onNavigateToModule={onNavigateToModule}
+      />
 
       <div className="ticker-strip" aria-label="Creator’s tools for a moving creator business">
         <div className="ticker-track">{[0, 1].map((copy) => <div className="ticker-group" key={copy} aria-hidden={copy === 1}><span>CONTENT INTELLIGENCE</span><Sparkles size={15} /><span>DEAL CLARITY</span><Zap size={15} /><span>CREATOR PROTECTION</span><Sparkles size={15} /><span>THE BUSINESS BEHIND THE POST</span><Zap size={15} /></div>)}</div>
@@ -152,7 +87,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchApp, onNavigat
 
       <ScrollStory onNavigateToModule={onNavigateToModule} />
 
-      <section id="experiments" className="section-pad lab-section">
+      <section id="interactive-lab" className="section-pad lab-section relative">
+        <span id="experiments" className="absolute -top-20" aria-hidden="true" />
         <div className="section-shell">
           <motion.div className="lab-header" {...revealProps()}><div><span className="section-index">02 / THE INTERACTIVE BITS</span><h2>A little less theory.<br /><span>A little more try-this.</span></h2></div><div className="lab-side-note"><span className="live-sample"><i /> SAMPLE WORKSPACE</span><p>These interactive previews use sample data. Take the controls for a spin.</p></div></motion.div>
           <div className="lab-tabs" role="tablist" aria-label="Creator tools preview">
