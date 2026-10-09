@@ -136,6 +136,26 @@ export async function resendVerificationEmail(email: string): Promise<{ error: E
   }
 }
 
+export async function signInWithGoogleOAuth(): Promise<{ error: Error | null }> {
+  if (!hasSupabaseConfig()) {
+    return { error: null };
+  }
+
+  try {
+    const supabase = getSupabase();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        scopes: 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/yt-analytics.readonly',
+        redirectTo: window.location.origin,
+      },
+    });
+    return { error };
+  } catch (err: any) {
+    return { error: err };
+  }
+}
+
 export async function signOut(): Promise<void> {
   if (hasSupabaseConfig()) {
     try {

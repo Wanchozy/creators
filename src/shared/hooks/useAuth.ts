@@ -4,6 +4,7 @@ import {
   signIn as authSignIn,
   signUp as authSignUp,
   signOut as authSignOut,
+  signInWithGoogleOAuth as authSignInWithGoogle,
   resendVerificationEmail,
   onAuthStateChange,
 } from '@/shared/repositories/authRepository';
@@ -96,12 +97,17 @@ export function useAuth() {
     }
   };
 
+  const signInWithGoogle = async () => {
+    return authSignInWithGoogle();
+  };
+
   return {
     user,
     loading,
     isConfigured,
     signIn,
     signUp,
+    signInWithGoogle,
     signOut,
     resendVerification,
     refreshUser,

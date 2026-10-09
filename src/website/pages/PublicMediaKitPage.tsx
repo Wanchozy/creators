@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { hasSupabaseConfig, getSupabase } from '@/shared/config/supabase';
 import { mockMediaKitProfile } from '@/shared/data/mockData';
+import { mediaKitRepository } from '@/shared/repositories/mediaKitRepository';
 import type { MediaKitProfile } from '@/shared/types';
 
 interface PublicMediaKitPageProps {
@@ -31,13 +32,15 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
       setLoading(true);
       setNotFound(false);
 
-      // If Supabase is configured, try to fetch by handle
+      const cleanHandle = handle.replace(/^@/, '');
+
+      // 1. If Supabase is configured, try to fetch from database case-insensitively
       if (hasSupabaseConfig()) {
         try {
           const { data, error } = await getSupabase()
             .from('media_kits')
             .select('*')
-            .eq('handle', `@${handle}`)
+            .or(`handle.ilike.@${cleanHandle},handle.ilike.${cleanHandle}`)
             .maybeSingle();
 
           if (!error && data) {
@@ -45,7 +48,7 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
             setMediaKit({
               id: data.id || 'kit-public',
               channelName: data.channel_name || handle,
-              handle: data.handle || `@${handle}`,
+              handle: data.handle || `@${cleanHandle}`,
               tagline: data.tagline || '',
               bio: data.bio || '',
               niche: data.niche || '',
@@ -66,13 +69,26 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
             return;
           }
         } catch {
-          // Fall through to demo fallback
+          // Fall through to repository / demo fallback
         }
       }
 
-      // Fallback: If the handle matches the mock profile handle, show demo data
-      const mockHandle = mockMediaKitProfile.handle.replace('@', '');
-      if (handle.toLowerCase() === mockHandle.toLowerCase()) {
+      // 2. Check local in-memory store in case creator edited it during this session
+      try {
+        const localKit = await mediaKitRepository.fetchMediaKit();
+        const localClean = (localKit.handle || '').replace(/^@/, '');
+        if (cleanHandle.toLowerCase() === localClean.toLowerCase()) {
+          setMediaKit(localKit);
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // Fall through to mock profile
+      }
+
+      // 3. Fallback: If the handle matches the mock profile handle, show demo data
+      const mockHandle = mockMediaKitProfile.handle.replace(/^@/, '');
+      if (cleanHandle.toLowerCase() === mockHandle.toLowerCase()) {
         setMediaKit(mockMediaKitProfile);
       } else {
         setNotFound(true);
@@ -204,15 +220,15 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-white/[0.06]">
             <div className="bg-[#07090e] rounded-xl p-3 border border-white/[0.05]">
               <div className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Total Reach</div>
-              <div className="text-lg font-bold text-white mt-0.5">{mediaKit.totalReach.toLocaleString()}</div>
+              <div className="text-lg font-bold text-white mt-0.5">{(mediaKit.totalReach ?? 0).toLocaleString()}</div>
             </div>
             <div className="bg-[#07090e] rounded-xl p-3 border border-white/[0.05]">
               <div className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Avg Views / 30d</div>
-              <div className="text-lg font-bold text-white mt-0.5">{mediaKit.avgViews30d.toLocaleString()}</div>
+              <div className="text-lg font-bold text-white mt-0.5">{(mediaKit.avgViews30d ?? 0).toLocaleString()}</div>
             </div>
             <div className="bg-[#07090e] rounded-xl p-3 border border-white/[0.05]">
               <div className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Engagement</div>
-              <div className="text-lg font-bold text-white mt-0.5">{mediaKit.avgEngagementRate}%</div>
+              <div className="text-lg font-bold text-white mt-0.5">{mediaKit.avgEngagementRate ?? 0}%</div>
             </div>
             <div className="bg-[#07090e] rounded-xl p-3 border border-white/[0.05]">
               <div className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Niche</div>
@@ -222,7 +238,7 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
         </section>
 
         {/* Platform Breakdown */}
-        {mediaKit.platforms.length > 0 && (
+        {Array.isArray(mediaKit.platforms) && mediaKit.platforms.length > 0 && (
           <section className="bg-[#0c0e14] rounded-2xl border border-white/[0.08] p-6">
             <h2 className="text-sm font-bold text-white mb-4 flex items-center space-x-2">
               <Globe className="w-4 h-4 text-indigo-400" />
@@ -238,15 +254,15 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
                       <div className="text-[10px] text-slate-500">Followers</div>
-                      <div className="text-xs font-bold text-white">{p.followers.toLocaleString()}</div>
+                      <div className="text-xs font-bold text-white">{(p.followers ?? 0).toLocaleString()}</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-slate-500">Avg Views</div>
-                      <div className="text-xs font-bold text-white">{p.avgViews.toLocaleString()}</div>
+                      <div className="text-xs font-bold text-white">{(p.avgViews ?? 0).toLocaleString()}</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-slate-500">Eng. Rate</div>
-                      <div className="text-xs font-bold text-emerald-400">{p.engagementRate}%</div>
+                      <div className="text-xs font-bold text-emerald-400">{p.engagementRate ?? 0}%</div>
                     </div>
                   </div>
                 </div>
@@ -256,7 +272,7 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
         )}
 
         {/* Audience Demographics */}
-        {mediaKit.demographics?.topCountries?.length > 0 && (
+        {Boolean(Array.isArray(mediaKit.demographics?.topCountries) && mediaKit.demographics.topCountries.length > 0) && (
           <section className="bg-[#0c0e14] rounded-2xl border border-white/[0.08] p-6">
             <h2 className="text-sm font-bold text-white mb-4 flex items-center space-x-2">
               <Users className="w-4 h-4 text-indigo-400" />
@@ -267,7 +283,7 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
               <div className="space-y-2">
                 <div className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Top Countries</div>
                 <div className="space-y-1.5">
-                  {mediaKit.demographics.topCountries.map((c) => (
+                  {(mediaKit.demographics?.topCountries || []).map((c) => (
                     <div key={c.code} className="flex items-center justify-between bg-[#07090e] rounded-lg px-3 py-2 border border-white/[0.04]">
                       <div className="flex items-center space-x-2">
                         <span className="text-xs font-bold text-white">{c.country}</span>
@@ -284,11 +300,11 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
               </div>
 
               {/* Age Split */}
-              {mediaKit.demographics.ageSplit?.length > 0 && (
+              {Boolean(Array.isArray(mediaKit.demographics?.ageSplit) && mediaKit.demographics.ageSplit.length > 0) && (
                 <div className="space-y-2">
                   <div className="text-[10px] text-slate-500 font-mono uppercase tracking-wider">Age Distribution</div>
                   <div className="space-y-1.5">
-                    {mediaKit.demographics.ageSplit.map((a) => (
+                    {(mediaKit.demographics?.ageSplit || []).map((a) => (
                       <div key={a.range} className="flex items-center space-x-3 bg-[#07090e] rounded-lg px-3 py-2 border border-white/[0.04]">
                         <span className="text-xs font-bold text-white w-16">{a.range}</span>
                         <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -308,7 +324,7 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
         )}
 
         {/* Verified Sponsor Track Record */}
-        {mediaKit.pastBrands.length > 0 && (
+        {Array.isArray(mediaKit.pastBrands) && mediaKit.pastBrands.length > 0 && (
           <section className="bg-[#0c0e14] rounded-2xl border border-white/[0.08] p-6">
             <h2 className="text-sm font-bold text-white mb-4 flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 text-indigo-400" />
@@ -334,7 +350,7 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
         )}
 
         {/* Rate Packages */}
-        {mediaKit.ratePackages.length > 0 && (
+        {Array.isArray(mediaKit.ratePackages) && mediaKit.ratePackages.length > 0 && (
           <section className="bg-[#0c0e14] rounded-2xl border border-white/[0.08] p-6">
             <h2 className="text-sm font-bold text-white mb-4 flex items-center space-x-2">
               <DollarSign className="w-4 h-4 text-indigo-400" />
@@ -364,10 +380,10 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
                     )}
                   </div>
                   <div className="text-2xl font-extrabold text-white">
-                    ${pkg.price.toLocaleString()}
+                    ${(pkg.price ?? 0).toLocaleString()}
                   </div>
                   <ul className="space-y-1.5">
-                    {pkg.deliverables.map((d, i) => (
+                    {(pkg.deliverables || []).map((d, i) => (
                       <li key={i} className="flex items-start space-x-2 text-[11px] text-slate-300">
                         <CheckCircle2 className="w-3 h-3 text-indigo-400 mt-0.5 shrink-0" />
                         <span>{d}</span>
@@ -410,3 +426,6 @@ export const PublicMediaKitPage: React.FC<PublicMediaKitPageProps> = ({ handle }
     </div>
   );
 };
+
+export default PublicMediaKitPage;
+

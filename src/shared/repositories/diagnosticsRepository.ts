@@ -29,6 +29,7 @@ function mapRowToDiagnostic(row: any): VideoDiagnostic {
     diagnoses: Array.isArray(row.diagnoses) ? row.diagnoses : [],
     possibleExperiments: Array.isArray(row.possible_experiments) ? row.possible_experiments : [],
     retentionTimeline: Array.isArray(row.retention_timeline) ? row.retention_timeline : [],
+    thumbnailUrl: row.thumbnail_url,
   };
 }
 
@@ -49,6 +50,7 @@ function mapDiagnosticToRow(diag: Partial<VideoDiagnostic>, userId?: string): Re
   if (diag.diagnoses !== undefined) row.diagnoses = diag.diagnoses;
   if (diag.possibleExperiments !== undefined) row.possible_experiments = diag.possibleExperiments;
   if (diag.retentionTimeline !== undefined) row.retention_timeline = diag.retentionTimeline;
+  if (diag.thumbnailUrl !== undefined) row.thumbnail_url = diag.thumbnailUrl;
   return row;
 }
 

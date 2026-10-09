@@ -21,14 +21,17 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile"
   ON public.profiles FOR SELECT
   USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 CREATE POLICY "Users can insert own profile"
   ON public.profiles FOR INSERT
   WITH CHECK (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
 CREATE POLICY "Users can update own profile"
   ON public.profiles FOR UPDATE
   USING (auth.uid() = id);
@@ -43,7 +46,8 @@ BEGIN
     COALESCE(NEW.raw_user_meta_data->>'channel_name', split_part(NEW.email, '@', 1)),
     COALESCE(NEW.raw_user_meta_data->>'primary_platform', 'youtube'),
     COALESCE(NEW.raw_user_meta_data->>'default_currency', 'USD')
-  );
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
@@ -82,18 +86,22 @@ CREATE INDEX IF NOT EXISTS deals_created_at_idx ON public.sponsorship_deals(crea
 
 ALTER TABLE public.sponsorship_deals ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can read own deals" ON public.sponsorship_deals;
 CREATE POLICY "Users can read own deals"
   ON public.sponsorship_deals FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own deals" ON public.sponsorship_deals;
 CREATE POLICY "Users can insert own deals"
   ON public.sponsorship_deals FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own deals" ON public.sponsorship_deals;
 CREATE POLICY "Users can update own deals"
   ON public.sponsorship_deals FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own deals" ON public.sponsorship_deals;
 CREATE POLICY "Users can delete own deals"
   ON public.sponsorship_deals FOR DELETE
   USING (auth.uid() = user_id);
@@ -127,18 +135,22 @@ CREATE INDEX IF NOT EXISTS diagnostics_created_at_idx ON public.video_diagnostic
 
 ALTER TABLE public.video_diagnostics ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can read own diagnostics" ON public.video_diagnostics;
 CREATE POLICY "Users can read own diagnostics"
   ON public.video_diagnostics FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own diagnostics" ON public.video_diagnostics;
 CREATE POLICY "Users can insert own diagnostics"
   ON public.video_diagnostics FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own diagnostics" ON public.video_diagnostics;
 CREATE POLICY "Users can update own diagnostics"
   ON public.video_diagnostics FOR UPDATE
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own diagnostics" ON public.video_diagnostics;
 CREATE POLICY "Users can delete own diagnostics"
   ON public.video_diagnostics FOR DELETE
   USING (auth.uid() = user_id);
@@ -172,14 +184,17 @@ CREATE INDEX IF NOT EXISTS rate_quotes_user_id_idx ON public.saved_rate_quotes(u
 
 ALTER TABLE public.saved_rate_quotes ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can read own rate quotes" ON public.saved_rate_quotes;
 CREATE POLICY "Users can read own rate quotes"
   ON public.saved_rate_quotes FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own rate quotes" ON public.saved_rate_quotes;
 CREATE POLICY "Users can insert own rate quotes"
   ON public.saved_rate_quotes FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can delete own rate quotes" ON public.saved_rate_quotes;
 CREATE POLICY "Users can delete own rate quotes"
   ON public.saved_rate_quotes FOR DELETE
   USING (auth.uid() = user_id);
@@ -206,14 +221,17 @@ CREATE INDEX IF NOT EXISTS copycat_user_id_idx ON public.copycat_alerts(user_id)
 
 ALTER TABLE public.copycat_alerts ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can read own copycat alerts" ON public.copycat_alerts;
 CREATE POLICY "Users can read own copycat alerts"
   ON public.copycat_alerts FOR SELECT
   USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own copycat alerts" ON public.copycat_alerts;
 CREATE POLICY "Users can insert own copycat alerts"
   ON public.copycat_alerts FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own copycat alerts" ON public.copycat_alerts;
 CREATE POLICY "Users can update own copycat alerts"
   ON public.copycat_alerts FOR UPDATE
   USING (auth.uid() = user_id);
@@ -239,7 +257,7 @@ CREATE TABLE IF NOT EXISTS public.sponsor_directory (
 
 ALTER TABLE public.sponsor_directory ENABLE ROW LEVEL SECURITY;
 
--- Curated sponsor directory is readable by all creators (both public and authenticated)
+DROP POLICY IF EXISTS "Anyone can read sponsor directory" ON public.sponsor_directory;
 CREATE POLICY "Anyone can read sponsor directory"
   ON public.sponsor_directory FOR SELECT
   USING (true);
@@ -253,3 +271,78 @@ VALUES
   ('Epidemic Sound', '🎵', 'Productivity / SaaS', 'High fit', 88, ARRAY['US', 'Europe', 'KE', 'NG'], '$3k - $8k', 'David K. (Music Curation Partnerships)', 'creator-collabs@epidemicsound.com', 'Looking for video editors, storytellers, and vloggers to showcase audio discovery.', ARRAY['Integration 60s', 'Tool tutorial']),
   ('Shopify', '🛍️', 'Fintech', 'Medium fit', 82, ARRAY['US', 'UK', 'CA', 'AU'], '$8k - $20k', 'Amina Yusuf (Direct-to-Consumer Growth)', 'partnerships@shopify-creatorhub.com', 'Aggressively backing e-commerce guides, side-hustle breakdowns, and creator commerce.', ARRAY['Dedicated 3-min segment', 'Custom series'])
 ON CONFLICT DO NOTHING;
+
+-- ==============================================================================
+-- Table 7: media_kits (Powers Media Kit Studio & Public One-Sheet /m/:handle)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.media_kits (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  channel_name TEXT NOT NULL DEFAULT 'Creator Studio',
+  handle TEXT NOT NULL DEFAULT '@creator',
+  tagline TEXT DEFAULT '',
+  bio TEXT DEFAULT '',
+  niche TEXT DEFAULT 'Technology',
+  contact_email TEXT DEFAULT '',
+  avatar_url TEXT,
+  verified_badge BOOLEAN DEFAULT true,
+  total_reach INTEGER DEFAULT 0,
+  avg_views_30d INTEGER DEFAULT 0,
+  avg_engagement_rate NUMERIC DEFAULT 6.5,
+  platforms JSONB DEFAULT '[]'::jsonb,
+  demographics JSONB DEFAULT '{}'::jsonb,
+  past_brands JSONB DEFAULT '[]'::jsonb,
+  rate_packages JSONB DEFAULT '[]'::jsonb,
+  custom_pitch_link TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  CONSTRAINT media_kits_user_id_unique UNIQUE(user_id)
+);
+
+CREATE INDEX IF NOT EXISTS media_kits_user_id_idx ON public.media_kits(user_id);
+CREATE INDEX IF NOT EXISTS media_kits_handle_idx ON public.media_kits(handle);
+
+ALTER TABLE public.media_kits ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can manage own media kit" ON public.media_kits;
+CREATE POLICY "Users can manage own media kit"
+  ON public.media_kits FOR ALL
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Public can view media kits" ON public.media_kits;
+CREATE POLICY "Public can view media kits"
+  ON public.media_kits FOR SELECT
+  USING (true);
+
+-- ==============================================================================
+-- Table 8: inbound_leads (Captures Brand Inquiries Submitted on Public Media Kit)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.inbound_leads (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  creator_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  brand_name TEXT NOT NULL,
+  contact_name TEXT,
+  contact_email TEXT NOT NULL,
+  budget_range TEXT,
+  campaign_goal TEXT,
+  deliverable_interest TEXT,
+  message TEXT,
+  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'reviewed', 'converted_to_deal', 'archived')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS inbound_leads_creator_id_idx ON public.inbound_leads(creator_id);
+
+ALTER TABLE public.inbound_leads ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can submit brand inquiry" ON public.inbound_leads;
+CREATE POLICY "Public can submit brand inquiry"
+  ON public.inbound_leads FOR INSERT
+  WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Creators can view and manage their inbound leads" ON public.inbound_leads;
+CREATE POLICY "Creators can view and manage their inbound leads"
+  ON public.inbound_leads FOR ALL
+  USING (auth.uid() = creator_id)
+  WITH CHECK (auth.uid() = creator_id);

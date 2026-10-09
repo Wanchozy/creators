@@ -50,13 +50,18 @@ function PageLoader() {
 }
 
 /**
- * Detect if the current URL is a public media kit link (/m/:handle).
+ * Detect if the current URL is a public media kit link (/m/:handle or /m/@:handle).
  * Returns the handle string if matched, otherwise null.
  */
 function detectPublicMediaKitHandle(): string | null {
   if (typeof window === 'undefined') return null;
-  const match = window.location.pathname.match(/^\/m\/([a-zA-Z0-9_.-]+)\/?$/);
-  return match ? match[1] : null;
+  const path = window.location.pathname;
+  const hash = window.location.hash;
+  const pathMatch = path.match(/^\/m\/@?([a-zA-Z0-9_.-]+)\/?$/);
+  if (pathMatch) return decodeURIComponent(pathMatch[1]);
+  const hashMatch = hash.match(/^#\/?m\/@?([a-zA-Z0-9_.-]+)\/?$/);
+  if (hashMatch) return decodeURIComponent(hashMatch[1]);
+  return null;
 }
 
 export function App() {

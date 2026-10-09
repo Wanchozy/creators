@@ -22,6 +22,7 @@ export interface VideoDiagnostic {
   diagnoses: string[];
   possibleExperiments: string[];
   retentionTimeline: RetentionPoint[];
+  thumbnailUrl?: string;
 }
 
 export interface CustomDiagnosisInput {

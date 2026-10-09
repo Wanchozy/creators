@@ -154,6 +154,17 @@ export const MediaKitStudioView: React.FC<MediaKitStudioViewProps> = ({ onSendTo
             <span>Print PDF</span>
           </button>
 
+          <a
+            href={`/m/${mediaKit.handle.replace(/^@/, '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-xs font-medium text-slate-300 hover:text-white flex items-center space-x-1.5 transition"
+            title="Open public media kit in new tab"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>Open Kit</span>
+          </a>
+
           <button
             onClick={handleCopyLink}
             className="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white flex items-center space-x-1.5 transition shadow-sm"

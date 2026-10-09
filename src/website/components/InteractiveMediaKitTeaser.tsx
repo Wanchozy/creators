@@ -216,7 +216,7 @@ export const InteractiveMediaKitTeaser: React.FC<InteractiveMediaKitTeaserProps>
               <div className="p-3 rounded-lg bg-white/[0.02] border border-white/[0.06] flex items-center justify-between text-xs text-slate-400">
                 <span className="flex items-center space-x-1.5">
                   <Globe className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>Public Media Kit Link: <strong className="text-slate-300 font-mono">creators.app/m/creatorstudio</strong></span>
+                  <span>Public Media Kit Link: <a href="/m/creatorstudio" target="_blank" rel="noopener noreferrer" className="text-slate-300 font-mono hover:text-indigo-400 underline underline-offset-2 transition">creators.app/m/creatorstudio</a></span>
                 </span>
                 <span className="text-[10px] font-mono text-emerald-400 font-semibold">1-Click PDF Ready</span>
               </div>
